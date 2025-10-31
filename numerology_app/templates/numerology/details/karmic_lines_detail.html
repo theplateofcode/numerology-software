@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Karmic Lines Detail{% endblock %}
+{% block content %}
+<main>
+  <div class="dashboard-card" style="max-width: 900px; margin: 0 auto;">
+    <h2>Karmic Line Meanings</h2>
+    <p class="subtitle">These are the meanings for the specific lines present (Positive) or missing (Negative) in your Lo Shu Grid.</p>
+
+    <div class="lines-grid">  {# Corrected class name typo from 'classs' #}
+      <div class="lines-section">
+        <h3 style="color: #1b7f4c;">Positive Lines (Arrows of Strength)</h3>
+        
+        {% if positive_lines %}
+          <ul class="meaning-list">
+            {% for line in positive_lines %}
+            <li>
+              <strong>{{ line.line_name }} ({{ line.numbers }})</strong>
+              <p>{{ line.description }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-lines-message">🎉 No specific positive lines (Arrows of Strength) were found in your chart.</p>
+        {% endif %}
+        
+      </div>
+
+      <div class="lines-section">
+        <h3 style="color: #a33636;">Negative Lines (Arrows of Weakness)</h3>
+        
+        {% if negative_lines %}
+          <ul class="meaning-list">
+            {% for line in negative_lines %}
+            <li>
+              <strong>{{ line.line_name }} ({{ line.numbers }})</strong>
+              <p>{{ line.description }}</p>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="no-lines-message">🎉 No specific negative lines (Arrows of Weakness) were found in your chart.</p>
+        {% endif %}
+        
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="{{ url_for('numerology.numerology_home') }}" class="secondary compact-button">← Back to Dashboard</a>
+    </div>
+  </div>
+</main>
+
+<style>
+  /* Optional: Style to make it look nicer */
+  .lines-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .lines-section {
+    margin-top: 1.5rem;
+  }
+  .meaning-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .meaning-list li {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-left: 5px solid var(--color-accent-light);
+    padding: 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+  }
+  /* Style for negative line items */
+  .lines-section:last-child .meaning-list li {
+    border-left-color: rgba(255, 0, 0, 0.2);
+  }
+  .meaning-list li strong {
+    font-size: 1.05rem;
+    color: var(--color-text);
+  }
+  .meaning-list li p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  /* Style for the 'no lines' message */
+  .no-lines-message {
+    background: #f9f9f9;
+    padding: 1rem;
+    border-radius: var(--radius);
+    text-align: center;
+    color: #555;
+    font-style: italic;
+  }
+
+  /* Responsive layout for smaller screens */
+  @media (max-width: 768px) {
+    .lines-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+</style>
+{% endblock %}

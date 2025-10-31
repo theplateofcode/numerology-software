@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Repeating Numbers — Details{% endblock %}
+{% block content %}
+<main>
+  <div class="numerology-detail">
+    <h1>Repeating Numbers</h1>
+
+    {% if repeated_data %}
+      <p class="subtitle">Your date of birth contains the following numbers. When a number appears more than once, its energy is amplified. Here is what each level of repetition means.</p>
+
+      {% for number, data in repeated_data.items() %}
+      <div class="repeated-number-group">
+        
+        <h2>Number {{ number }} (Appears {{ data.count }} time(s))</h2>
+        
+        {% for item in data.meanings %}
+        <div class="repeated-item">
+          <span class="repetition-count">Meaning for {{ item.repetitions }} repetition(s)</span>
+          <p class="repetition-details">{{ item.meaning }}</p>
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+    {% else %}
+      <p style="text-align:center; margin-top:2rem;">You have no significant repeating numbers in your chart.</p>
+    {% endif %}
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="{{ url_for('numerology.numerology_home') }}" class="secondary">← Back to Dashboard</a>
+    </div>
+  </div>
+</main>
+
+<style>
+  .repeated-number-group {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: 1rem 1.5rem;
+    margin-top: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .repeated-number-group h2 {
+    color: var(--color-accent);
+    margin-top: 0;
+    border-bottom: 2px solid var(--color-accent-light);
+    padding-bottom: 0.5rem;
+  }
+  .repeated-item {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 1rem 0;
+  }
+  .repeated-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .repetition-count {
+    display: block;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  .repetition-details {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+</style>
+
+{% endblock %}

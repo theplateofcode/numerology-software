@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+
+<div class="login-container">
+  <div class="login-card">
+
+    <div class="logo-placeholder">
+        N
+    </div>
+    
+    <div class="login-header">
+      <h1>Numerology by Neha</h1>
+      <p>Please enter your credentials to log in.</p>
+    </div>
+
+    <form method="post" class="login-form">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input id="username" type="text" name="username" placeholder="Enter your username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" name="password" placeholder="Enter your password" required>
+      </div>
+      
+      {% if error %}
+        <p class="error-message">{{ error }}</p>
+      {% endif %}
+
+      <button type="submit" class="login-button">Login</button>
+    </form>
+    
+  </div>
+</div>
+
+<style>
+  /* Ensure the container takes full screen height */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    /* MODIFIED: Subtle gradient background */
+    background: linear-gradient(135deg, var(--color-bg, #F7F5FB) 0%, #EDE9F6 100%);
+  }
+
+  .login-card {
+    background-color: var(--color-surface, #FFFFFF);
+    padding: 2.5rem 3rem;
+    border-radius: var(--radius, 12px);
+    box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,0.1)); /* Slightly stronger shadow */
+    border: 1px solid var(--color-border, #E7E1F7);
+    width: 100%;
+    max-width: 450px; /* Slightly wider */
+    text-align: center;
+  }
+  
+  /* NEW: Logo Placeholder Style */
+  .logo-placeholder {
+      width: 60px;
+      height: 60px;
+      background: var(--color-accent-light, #CBB7F0);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--color-accent, #A18CD1);
+      margin: 0 auto 1.5rem auto; /* Center and add space below */
+      font-family: 'Playfair Display', serif; /* Optional: Use royal font */
+  }
+
+  .login-header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-accent, #A18CD1);
+  }
+  
+  .login-header p {
+      margin-bottom: 2rem;
+      color: var(--color-text, #636363);
+  }
+
+  .login-form .form-group {
+    margin-bottom: 1.25rem;
+    text-align: left;
+  }
+  
+  .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #555; /* Slightly darker label */
+  }
+
+  .login-form input {
+    width: 100%;
+    padding: 0.8rem; /* Slightly larger padding */
+    font-size: 1rem;
+    border: 1px solid var(--color-border, #E7E1F7);
+    border-radius: var(--radius, 8px);
+    box-sizing: border-box; 
+    transition: all 0.2s ease;
+    background-color: #FAFAFC; /* Slightly off-white input */
+  }
+
+  .login-form input:focus {
+    outline: none;
+    border-color: var(--color-accent, #A18CD1);
+    /* MODIFIED: Enhanced focus shadow */
+    box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.25); 
+    background-color: #fff; /* White on focus */
+  }
+  
+  .error-message {
+      color: #D8000C; 
+      background-color: #FFD2D2; 
+      border: 1px solid #D8000C;
+      padding: 0.75rem;
+      border-radius: var(--radius, 8px);
+      margin-top: 1.5rem;
+      margin-bottom: 0;
+      font-size: 0.9rem; /* Slightly smaller error text */
+  }
+
+  .login-button {
+    width: 100%;
+    padding: 0.9rem; /* Slightly larger padding */
+    font-size: 1.1rem;
+    font-weight: 700; /* Bolder text */
+    color: white;
+    background-color: var(--color-accent, #A18CD1);
+    border: none;
+    border-radius: var(--radius, 8px);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Added transform */
+    margin-top: 1.5rem;
+    text-transform: uppercase; /* Uppercase text */
+    letter-spacing: 0.5px; /* Added letter spacing */
+  }
+  
+  .login-button:hover {
+      background-color: var(--color-hover, #917BC5);
+      transform: translateY(-2px); /* Slight lift on hover */
+  }
+  .login-button:active {
+       transform: translateY(0); /* Press down effect */
+  }
+
+</style>
+{% endblock %}

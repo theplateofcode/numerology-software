@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Birthday Number {{ number }}{% endblock %}
+
+{% block content %}
+<section class="numerology-detail">
+  <h1>Birthday Number — {{ number }}</h1>
+  
+  <div class="description-content">
+    {% if data and data.description %}
+      <ul class="keyword-list">
+        {# Split the description string by commas and loop through each word #}
+        {% for keyword in data.description.split(',') %}
+          {% if keyword.strip() %} {# Ensure empty strings don't create a list item #}
+            <li>{{ keyword.strip() }}</li><br>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No data found for Birthday Number {{ number }}.</p>
+    {% endif %}
+  </div>
+  
+  <p style="margin-top:1.5rem;"><a href="{{ url_for('numerology.numerology_home') }}" class="secondary compact-button">← Back</a></p>
+</section>
+
+<style>
+  .description-content {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: var(--radius, 8px);
+    padding: 1.5rem 2rem;
+    margin-top: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  /* NEW: Styles for the keyword list */
+  .description-content .keyword-list {
+    margin: 0;
+    padding: 0;
+    list-style: none; /* Remove bullets */
+    display: flex; /* Make it a flex container */
+    flex-wrap: wrap; /* Allow items to wrap to the next line */
+    gap: 8px 12px; /* Add spacing between keywords */
+  }
+  
+  .description-content .keyword-list li {
+    font-size: 1rem; /* Smaller font for keywords */
+    line-height: 1.4;
+    padding: 0.3rem 0.75rem; /* Padding to create "chips" */
+    background-color: var(--color-bg, #F7F5FB); /* Subtle background */
+    border: 1px solid var(--color-border, #E7E1F7);
+    border-radius: 20px; /* Pill shape */
+    font-weight: 500;
+  }
+  
+  /* Fallback for when no data is found */
+  .description-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0;
+    text-align: center;
+    font-style: italic;
+  }
+</style>
+{% endblock %}

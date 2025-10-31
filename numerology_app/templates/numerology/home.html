@@ -1,0 +1,317 @@
+{% extends "base.html" %} {% block title %}Numerology Dashboard{% endblock %} {%
+block content %}
+
+<header class="page-header">
+  <h1 class="page-title">Numerology</h1>
+  <a href="/home" class="home-link">← Back to Home</a>
+</header>
+
+<main>
+  <form method="post" action="" class="form-bar">
+    <input
+      id="first_name" name="first_name" type="text" placeholder="First name"
+      value="{{ session['numerology_input']['first_name'] if session.get('numerology_input') else '' }}" required
+    />
+    <input
+      id="middle_name" name="middle_name" type="text" placeholder="Middle name"
+      value="{{ session['numerology_input']['middle_name'] if session.get('numerology_input') else '' }}"
+    />
+    <input
+      id="last_name" name="last_name" type="text" placeholder="Last name"
+      value="{{ session['numerology_input']['last_name'] if session.get('numerology_input') else '' }}" required
+    />
+    <input
+      id="dob" name="dob" type="date"
+      value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
+    />
+    <button type="submit" class="compact-button">Generate Report</button>
+
+    <button type="button" id="loadClientBtn" class="compact-button secondary-style icon-button" title="Load Client">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1.2em" height="1.2em">
+        <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+    <button type="button" id="generatePdfBtn" class="compact-button secondary-style icon-button" title="Generate PDF Report">
+       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="1.2em" height="1.2em">
+         <path fill-rule="evenodd" d="M5.625 1.5c-1.036 0-1.875.84-1.875 1.875v17.25c0 1.035.84 1.875 1.875 1.875h12.75c1.035 0 1.875-.84 1.875-1.875V12.75A3.75 3.75 0 0 0 16.5 9h-1.875a1.875 1.875 0 0 1-1.875-1.875V5.25A3.75 3.75 0 0 0 9 1.5H5.625ZM7.5 15a.75.75 0 0 1 .75-.75h7.5a.75.75 0 0 1 0 1.5h-7.5A.75.75 0 0 1 7.5 15Zm.75 2.25a.75.75 0 0 0 0 1.5H12a.75.75 0 0 0 0-1.5H8.25Z" clip-rule="evenodd" />
+         <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.767 9.767 0 0 0-3.21.362 7.123 7.123 0 0 1-8.176 0 9.778 9.778 0 0 0-3.21-.362 5.232 5.232 0 0 1 3.434-1.279H11.25a1.875 1.875 0 0 0-1.875-1.875v-1.875c0-1.01.818-1.833 1.833-1.871A5.253 5.253 0 0 1 12.971 1.816Z" />
+       </svg>
+    </button>
+
+    <button type="button" id="clearFormBtn" class="compact-button secondary-style" title="Clear Inputs">Clear</button>
+  </form>
+
+  {% set has_results = results and results.get('life_path') %} {% if has_results %}
+
+  <div class="dashboard-grid">
+
+    <div class="dashboard-card">
+      <h4>Primary Findings for {{ session['numerology_input']['first_name'] }}</h4>
+      <table class="primary-table">
+        <tbody>
+          <tr>
+            <td>Life Path</td><td>{{ results.get('life_path', '—') }}</td>
+            <td>{% if results.get('life_path') %}<a href="{{ url_for('numerology_details.life_path_detail', number=results.get('life_path')) }}" class="secondary">Details</a>{% else %}—{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Expression</td><td>{{ results.get('expression', '—') }}</td>
+            <td>{% if results.get('expression') %}<a href="{{ url_for('numerology_details.life_expression_detail', number=results.get('expression')) }}" class="secondary">Details</a>{% else %}—{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Soul Urge</td><td>{{ results.get('soul_urge', '—') }}</td>
+            <td>{% if results.get('soul_urge') %}<a href="{{ url_for('numerology_details.soul_urge_detail', number=results.get('soul_urge')) }}" class="secondary">Details</a>{% else %}—{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Birthday</td><td>{{ results.get('birthday', '—') }}</td>
+            <td>{% if results.get('birthday') %}<a href="{{ url_for('numerology_details.birthday_detail', number=results.get('birthday')) }}" class="secondary">Details</a>{% else %}—{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Alphabet</td><td>{{ results.get('alphabet', '—') }}</td>
+            <td>{% if results.get('alphabet') and results.get('alphabet') != '—' %}<a href="{{ url_for('numerology_details.alphabet_detail', letter=results.get('alphabet')) }}" class="secondary">Details</a>{% else %}—{% endif %}</td>
+          </tr>
+          <tr>
+            <td>Missing</td><td>{{ results.get('missing_repeat', {}).get('missing', '—') }}</td>
+            <td><a href="{{ url_for('numerology_details.missing_detail') }}" class="secondary">Details</a></td>
+          </tr>
+          <tr>
+            <td>Repeating</td><td>{{ results.get('missing_repeat', {}).get('repeating', '—') }}</td>
+            <td><a href="{{ url_for('numerology_details.repeating_detail') }}" class="secondary">Details</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="dashboard-card">
+      <h4>Future Prediction</h4>
+      {% if results.get('future_prediction') %}
+      <table class="detail-table">
+        <tbody>
+          <tr>
+            <td>Lucky Year</td><td>{{ results['future_prediction'].get('lucky_year', '—') }}</td>
+          </tr>
+          <tr>
+            <td>Lucky Month</td><td>{{ results['future_prediction'].get('lucky_month', '—') }}</td>
+          </tr>
+          <tr>
+            <td>Lucky Day</td><td>{{ results['future_prediction'].get('lucky_day', '—') }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <a href="{{ url_for('numerology_details.future_prediction_detail') }}" class="secondary" style="margin-top: 0.8rem; display: inline-block;">View Meanings</a>
+      {% else %}
+      <p>—</p>
+      {% endif %}
+    </div>
+
+    <div class="dashboard-card">
+      <h4>Karmic Details</h4>
+
+      {% if results.get('karmic_chart') %}
+      <div class="karmic-grid">
+        <table>
+          <tbody>
+            {% for row_numbers in [[3,6,9], [2,5,8], [1,4,7]] %}
+            <tr>
+              {% for n in row_numbers %}
+              <td>
+                {% set count = results['karmic_chart']['chart'].get(n, results['karmic_chart']['chart'].get(n|string, 0)) %}
+                {% if count > 0 %}
+                  {{ n|string * count }}
+                {% else %}
+                  &nbsp;
+                {% endif %}
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <hr style="margin: 1rem 0; border-top: 1px solid var(--color-border);">
+
+      <table class="detail-table lines-summary-table">
+        <tbody>
+          {% set pos = results.get('karmic_chart', {}).get('positive_lines', []) %}
+          {% set neg = results.get('karmic_chart', {}).get('negative_lines', []) %}
+          {% set max_len = [pos|length, neg|length]|max %}
+
+          {% for i in range(max_len) %}
+          <tr>
+            <td class="pos-line">
+              {{ pos[i] if i < pos|length else '' }}
+            </td>
+            <td class="neg-line">
+              {{ neg[i] if i < neg|length else '' }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="2" style="text-align: center; font-style: italic; color: #888;">No significant lines found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <a href="{{ url_for('numerology_details.karmic_lines_detail') }}"
+         class="secondary"
+         style="margin-top: 0.8rem; display: inline-block;">
+        View Lines Meanings
+      </a>
+
+      {% else %}
+      <p>No chart data.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% else %}
+  <div class="dashboard-card" style="text-align: center; padding: 4rem">
+    <h2>Welcome to the Numerology Dashboard</h2>
+    <p>Please enter a name and date of birth above to generate a report.</p>
+  </div>
+  {% endif %}
+</main>
+
+<div id="clientModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close-button">&times;</span>
+    <h3>Load a Client</h3>
+    <input type="text" id="clientSearchInput" placeholder="Search for clients..."/>
+    <div class="client-list-header">
+      <span>Name</span>
+      <span>Date of Birth</span>
+    </div>
+    <div class="modal-client-list">
+      {% if clients %}
+      <ul>
+        {% for client in clients %}
+        <li class="client-item">
+          {% set dob_str = client.dob if client.dob is string else client.dob.strftime('%Y-%m-%d') %}
+          {% set dob_display = client.dob if client.dob is string else client.dob.strftime('%d-%b-%Y') %}
+          <a href="#" data-fname="{{ client.first_name }}" data-mname="{{ client.middle_name }}" data-lname="{{ client.last_name }}" data-dob="{{ dob_str }}">
+            <span class="client-name">{{ client.full_name }}</span>
+            <span class="client-dob">{{ dob_display }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No clients have been saved yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Header Styles */
+  .page-header { display: flex; justify-content: space-between; align-items: center; padding: 0 0.5rem 1rem 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); }
+  .page-title { margin: 0; font-size: 1.5rem; color: var(--color-accent); }
+  .home-link { font-size: 0.9rem; font-weight: 500; color: var(--color-accent); text-decoration: none; }
+  .home-link:hover { color: var(--color-hover); }
+
+  /* Button Styles */
+  .compact-button.secondary-style { background-color: var(--color-accent-light); color: var(--color-text); }
+  .compact-button.secondary-style:hover { background-color: var(--color-hover); color: white; }
+  .form-bar > * { vertical-align: middle; }
+  .icon-button { padding: 0.45rem 0.6rem; line-height: 0; }
+  .icon-button svg { vertical-align: middle; }
+
+  /* Three-Column Dashboard Layout */
+  .dashboard-grid { display: grid; grid-template-columns: 2.5fr 1.2fr 1.3fr; gap: 1.5rem; align-items: start; }
+  @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+  /* Table & Chart Styles */
+  .karmic-grid table td { width: 33%; height: 3rem; text-align: center; vertical-align: middle; border: 1px solid var(--color-border); font-weight: bold; font-size: 1.1rem; }
+  .detail-table th { background: var(--color-accent-light); text-align: center; }
+  .detail-table td { text-align: center; vertical-align: middle; }
+  .primary-table td:first-child { font-weight: 500; text-align: left; }
+  .primary-table td:nth-child(2) { font-weight: 600; color: var(--color-accent); }
+
+  /* Modal Styles */
+  .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.6); }
+  .modal-content { background-color: #fefefe; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px 30px; border: 1px solid #ddd; width: 90%; max-width: 550px; max-height: 80vh; border-radius: var(--radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; }
+  .modal-close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
+  #clientSearchInput { width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid var(--color-border); border-radius: var(--radius); }
+  .client-list-header { display: flex; justify-content: space-between; padding: 8px 10px; font-weight: bold; color: var(--color-accent); border-bottom: 2px solid var(--color-accent-light); margin-bottom: 5px; }
+  .modal-client-list { max-height: 300px; overflow-y: auto; border: 1px solid var(--color-border); border-radius: var(--radius); flex-grow: 1; scrollbar-width: thin; scrollbar-color: #c1c1c1 #f1f1f1; }
+  .modal-client-list::-webkit-scrollbar { width: 8px; }
+  .modal-client-list::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+  .modal-client-list::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+  .modal-client-list::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+  .modal-client-list ul { list-style: none; padding: 0; margin: 0; }
+  .modal-client-list .client-item a { display: flex; justify-content: space-between; align-items: center; padding: 12px 10px; text-decoration: none; color: var(--color-text); border-bottom: 1px solid var(--color-border); }
+  .modal-client-list .client-item:last-child a { border-bottom: none; }
+  .modal-client-list .client-item a:hover { background-color: #f5f3f7; }
+  .modal-client-list .client-name { font-weight: 500; flex-grow: 1; margin-right: 10px; }
+  .modal-client-list .client-dob { font-size: 0.9em; color: #777; white-space: nowrap; }
+
+  /* Sleek Lines Table Styles */
+  .lines-summary-table { width: 100%; margin-top: 1rem; border-collapse: collapse; }
+  .lines-summary-table td { padding: 0.6rem 0.8rem; text-align: center; font-weight: 500; border-bottom: 1px solid var(--color-border); font-size: 0.9rem; }
+  .lines-summary-table td.pos-line { border-left: 3px solid #1b7f4c; }
+  .lines-summary-table td.neg-line { border-left: 3px solid #a33636; }
+  .lines-summary-table td:empty { border-left: none; }
+  .lines-summary-table tr:last-child td { border-bottom: none; }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const modal = document.getElementById("clientModal");
+    const openBtn = document.getElementById("loadClientBtn");
+    const closeBtn = document.querySelector(".modal-close-button");
+    const searchInput = document.getElementById("clientSearchInput");
+    const clientItems = document.querySelectorAll(".modal-client-list .client-item");
+    const clearBtn = document.getElementById("clearFormBtn"); // Get the Clear button
+
+    if (openBtn) { openBtn.onclick = () => { modal.style.display = "block"; }; }
+    if (closeBtn) { closeBtn.onclick = () => { modal.style.display = "none"; }; }
+    window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
+
+    document.querySelectorAll(".client-item a").forEach((item) => {
+      item.addEventListener("click", function (event) {
+        event.preventDefault();
+        document.getElementById("first_name").value = this.dataset.fname;
+        document.getElementById("middle_name").value = this.dataset.mname;
+        document.getElementById("last_name").value = this.dataset.lname;
+        document.getElementById("dob").value = this.dataset.dob;
+        modal.style.display = "none";
+        document.querySelector(".form-bar").submit();
+      });
+    });
+
+    if (searchInput) {
+      searchInput.addEventListener("keyup", function () {
+        const filter = searchInput.value.toLowerCase();
+        clientItems.forEach((item) => {
+          const clientName = item.querySelector(".client-name").textContent.toLowerCase();
+          item.style.display = clientName.includes(filter) ? "" : "none";
+        });
+      });
+    }
+
+    // Clear Button Logic
+    if (clearBtn) {
+        clearBtn.addEventListener("click", function() {
+            document.getElementById("first_name").value = '';
+            document.getElementById("middle_name").value = '';
+            document.getElementById("last_name").value = '';
+            document.getElementById("dob").value = '';
+            // If you want to clear the results too, you'd need to make a request to the server
+            // For now, this just clears the input fields.
+        });
+    }
+
+    // PDF Report Button Logic
+    const pdfBtn = document.getElementById("generatePdfBtn");
+    if (pdfBtn) {
+      pdfBtn.addEventListener("click", function (event) { // Added event parameter
+        event.preventDefault(); // Prevent default button action
+        // Open the generated PDF in a new tab
+        window.open("{{ url_for('numerology.numerology_report_pdf') }}", "_blank");
+      });
+    }
+  });
+</script>
+
+{% endblock %}

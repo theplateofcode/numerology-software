@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+
+<div class="home-container">
+  <aside class="side-nav">
+    <div class="nav-header">
+      <h2>Dashboard</h2>
+    </div>
+    <nav>
+      <ul>
+        <li><a href="{{ url_for('numerology.numerology_home') }}">Numerology</a></li>
+        <li><a href="{{ url_for('matchmaking.matchmaking_home') }}">Matchmaking</a></li>
+        <li><a href="{{ url_for('clients.clients_list') }}">Client History</a></li>
+        <li><a href="{{ url_for('docs.docs_home') }}">Documentation</a></li>
+      </ul>
+    </nav>
+    <div class="nav-footer">
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+  </aside>
+
+  <section class="image-panel">
+    <img src="{{ url_for('static', filename='img/featured.jpg') }}" alt="Featured">
+  </section>
+</div>
+
+<style>
+  /* Remove default body margin and ensure full height */
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling on the main page */
+  }
+
+  /* Main two-column container */
+  .home-container {
+    display: flex;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+  }
+
+  /* Left-side navigation panel */
+  .side-nav {
+    flex: 0 0 300px; /* Do not grow or shrink, fixed width of 300px */
+    background-color: var(--color-surface, #ffffff);
+    border-right: 1px solid var(--color-border, #e0e0e0);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.05);
+  }
+
+  .nav-header h2 {
+    margin-top: 0;
+    color: var(--color-accent, #A18CD1);
+    font-size: 1.8rem;
+  }
+
+  .side-nav nav {
+      flex-grow: 1; /* Pushes the footer down */
+      margin-top: 2rem;
+  }
+
+  .side-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .side-nav li a {
+    display: block;
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+    color: var(--color-text, #636363);
+    font-weight: 500;
+    border-radius: var(--radius, 8px);
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .side-nav li a:hover {
+    background-color: var(--color-bg, #F7F5FB);
+    color: var(--color-accent, #A18CD1);
+  }
+
+  .nav-footer a {
+      display: block;
+      text-align: center;
+      padding: 0.75rem;
+      text-decoration: none;
+      color: var(--color-text, #636363);
+      background-color: var(--color-bg, #F7F5FB);
+      border-radius: var(--radius, 8px);
+      font-weight: 500;
+      transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  .nav-footer a:hover {
+      background-color: var(--color-accent, #A18CD1);
+      color: white;
+  }
+
+  /* Right-side image panel */
+  .image-panel {
+    flex-grow: 1; /* Takes up the remaining width */
+    overflow: hidden; /* Hides any part of the image that overflows */
+    height: 100vh;
+  }
+
+  .image-panel img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Scales the image to cover the area without distortion */
+  }
+</style>
+{% endblock %}

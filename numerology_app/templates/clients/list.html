@@ -1,0 +1,306 @@
+{% extends "base.html" %}
+{% block title %}Clients{% endblock %}
+{% block content %}
+
+<header class="page-header">
+  <h1 class="page-title">Client List</h1>
+  <a href="/home" class="home-link">← Back to Home</a>
+</header>
+
+<div class="clients-container">
+  <div class="dashboard-card">
+    <table class="primary-table client-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>DOB</th>
+          <th>Report Created</th>
+          <th style="width: 100px;">Action</th> {# Added Action header #}
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in clients %}
+        <tr class="client-row" data-id="{{ c.id }}" data-fname="{{ c.first_name }}" data-mname="{{ c.middle_name or '' }}" data-lname="{{ c.last_name or '' }}" data-dob="{{ c.dob }}">
+          <td>{{ c.full_name }}</td>
+          <td>{{ c.dob }}</td>
+          <td>
+            {% if c.created_at %}
+              {{ c.created_at.strftime('%d-%b-%Y %H:%M') }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td>
+            <div class="actions-menu">
+              <button class="actions-btn" aria-haspopup="true">
+                Select <span class="arrow-down">▼</span>
+              </button>
+              <div class="actions-dropdown">
+                <button class="action-item edit-btn">Edit</button>
+                <button class="action-item delete-btn">Delete</button>
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align:center;">No clients found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div id="editModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close-button">&times;</span>
+    <h3>Edit Client</h3>
+    <form id="editForm" method="POST" action=""> {# Action URL will be set by JS #}
+      <div class="form-group">
+        <label for="edit_first_name">First Name</label>
+        <input id="edit_first_name" name="first_name" type="text" required>
+      </div>
+      <div class="form-group">
+        <label for="edit_middle_name">Middle Name</label>
+        <input id="edit_middle_name" name="middle_name" type="text">
+      </div>
+      <div class="form-group">
+        <label for="edit_last_name">Last Name</label>
+        <input id="edit_last_name" name="last_name" type="text">
+      </div>
+      <div class="form-group">
+        <label for="edit_dob">Date of Birth</label>
+        <input id="edit_dob" name="dob" type="date" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-clear modal-cancel-btn">Cancel</button>
+        <button type="submit" class="btn-accent">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <span class="modal-close-button">&times;</span>
+    <h3>Delete Client</h3>
+    <p>Are you sure you want to delete this client? This action cannot be undone.</p>
+    <p id="deleteClientName" style="font-weight: bold; text-align: center; margin: 1rem 0;"></p>
+    <form id="deleteForm" method="POST" action=""> {# Action URL will be set by JS #}
+      <div class="modal-actions">
+        <button type="button" class="btn-clear modal-cancel-btn">Cancel</button>
+        <button type="submit" class="btn-danger">Delete</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  /* Header Styles */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem 1rem 1.5rem;
+    margin: 1rem 1.5rem 0 1.5rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .page-title { margin: 0; font-size: 1.5rem; color: var(--color-accent); }
+  .home-link { font-size: 0.9rem; font-weight: 500; color: var(--color-accent); text-decoration: none; }
+  .home-link:hover { color: var(--color-hover); }
+
+  /* Main Container */
+  .clients-container { padding: 1.5rem; }
+  .dashboard-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); padding: 1.5rem; box-shadow: var(--shadow); }
+
+  /* Table Styles */
+  .primary-table.client-table { width: 100%; border-collapse: collapse; }
+  .primary-table th, .primary-table td { border: 1px solid var(--color-border); padding: 0.7rem 1rem; text-align: left; }
+  .primary-table th { background: var(--color-accent-light); }
+  .primary-table tr:nth-child(even) { background: var(--color-bg); }
+
+  /* --- NEW: Actions Dropdown Styles --- */
+  .actions-menu { position: relative; }
+  .actions-btn {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .actions-btn:hover { background: var(--color-bg); }
+  .actions-btn .arrow-down { font-size: 0.7rem; transform: scaleY(0.8); }
+  
+  .actions-dropdown {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: var(--shadow);
+    z-index: 10;
+    width: 120px;
+    padding: 5px;
+  }
+  .actions-dropdown.show { display: block; }
+  .action-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-radius: 4px;
+  }
+  .action-item:hover { background: var(--color-bg); color: var(--color-accent); }
+  .action-item.delete-btn:hover { background: #FFF0F0; color: #D8000C; }
+
+  /* --- NEW: Modal Styles --- */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  .modal-content {
+    background-color: var(--color-surface);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 25px 30px;
+    border: 1px solid #ddd;
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--radius);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  }
+  .modal-close-button {
+    color: #aaa;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .modal-content h3 {
+    margin-top: 0;
+    color: var(--color-accent);
+    font-family: 'Playfair Display', serif;
+  }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; font-size: 0.9rem; }
+  .form-group input { width: 100%; padding: 0.6rem 0.8rem; box-sizing: border-box; border: 1px solid var(--color-border); border-radius: 6px; }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .btn-accent, .btn-clear, .btn-danger {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .btn-accent { background: var(--color-accent); color: white; }
+  .btn-accent:hover { background: var(--color-hover); }
+  .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; }
+  .btn-clear:hover { background: #ddd; }
+  .btn-danger { background: #D8000C; color: white; }
+  .btn-danger:hover { background: #A00000; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const editModal = document.getElementById("editModal");
+  const deleteModal = document.getElementById("deleteModal");
+  const editForm = document.getElementById("editForm");
+  const deleteForm = document.getElementById("deleteForm");
+
+  // --- 1. Actions Dropdown Logic ---
+  document.querySelectorAll(".actions-btn").forEach(button => {
+    button.addEventListener("click", (e) => {
+      e.stopPropagation(); // Prevent click from bubbling to document
+      // Close all other open dropdowns
+      document.querySelectorAll(".actions-dropdown.show").forEach(menu => {
+        if (menu !== button.nextElementSibling) {
+          menu.classList.remove("show");
+        }
+      });
+      // Toggle the current dropdown
+      button.nextElementSibling.classList.toggle("show");
+    });
+  });
+
+  // Close dropdowns if clicking anywhere else
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".actions-dropdown.show").forEach(menu => {
+      menu.classList.remove("show");
+    });
+  });
+
+  // --- 2. Modal Close Logic (for all modals) ---
+  document.querySelectorAll(".modal-close-button, .modal-cancel-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      editModal.style.display = "none";
+      deleteModal.style.display = "none";
+    });
+  });
+
+  // --- 3. Edit Button Logic ---
+  document.querySelectorAll(".edit-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const row = e.target.closest(".client-row");
+      const client = row.dataset;
+      
+      // Set the form's action URL
+      editForm.action = `/clients/edit/${client.id}`;
+      
+      // Populate the form fields
+      document.getElementById("edit_first_name").value = client.fname;
+      document.getElementById("edit_middle_name").value = client.mname;
+      document.getElementById("edit_last_name").value = client.lname;
+      document.getElementById("edit_dob").value = client.dob;
+      
+      // Show the modal
+      editModal.style.display = "block";
+    });
+  });
+
+  // --- 4. Delete Button Logic ---
+  document.querySelectorAll(".delete-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const row = e.target.closest(".client-row");
+      const client = row.dataset;
+      
+      // Set the form's action URL
+      deleteForm.action = `/clients/delete/${client.id}`;
+      
+      // Show client name for confirmation
+      document.getElementById("deleteClientName").textContent = `${client.fname} ${client.lname || ''}`;
+      
+      // Show the modal
+      deleteModal.style.display = "block";
+    });
+  });
+
+});
+</script>
+
+{% endblock %}

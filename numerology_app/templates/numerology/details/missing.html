@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Missing Numbers — Details{% endblock %}
+{% block content %}
+<main>
+  <div class="numerology-detail">
+    <h1>Missing Numbers</h1>
+
+    {% if missing_numbers %}
+      <p class="subtitle">These numbers are missing in your date of birth and show areas of learning or growth.</p>
+
+      <table class="detail-table">
+        <thead>
+          <tr>
+            <th style="text-align:center;">Number</th>
+            <th style="text-align:center;">Associated Life Area</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in missing_numbers %}
+          <tr>
+            <td style="text-align:center; font-weight:600;">{{ item.number }}</td>
+            <td>{{ item.details }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    {% else %}
+      <p style="text-align:center; margin-top:2rem;">🎉 You have no missing numbers — a well-balanced numerological chart!</p>
+    {% endif %}
+
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a href="{{ url_for('numerology.numerology_home') }}" class="secondary">← Back to Dashboard</a>
+    </div>
+  </div>
+</main>
+
+<style>
+  .detail-table {
+    width: auto; /* This makes the table fit its content */
+    margin: 0 auto; /* This centers the table */
+  }
+</style>
+
+{% endblock %}

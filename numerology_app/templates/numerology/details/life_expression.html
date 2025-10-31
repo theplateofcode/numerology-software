@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Expression Number {{ number }}{% endblock %}
+
+{% block content %}
+<section class="numerology-detail">
+  <h1>Life Expression / Destiny — {{ number }}</h1>
+  
+  {% if data %}
+    
+    {% if data.description %}
+      {# --- NEW IMPACTFUL HEADING --- #}
+      {# This splits the description at the first period '.' #}
+      {% set parts = data.description.split('.', 1) %}
+      
+      {# Display the first sentence (parts[0]) as a subtitle #}
+      <h2 class="expression-subtitle">
+        "{{ parts[0] | trim }}."
+      </h2>
+      
+      <table class="detail-table">
+        <tbody>
+          <tr>
+            <td><strong>Overview</strong></td>
+            {# Display the rest of the description (parts[1]) #}
+            <td>{{ parts[1] | trim if parts|length > 1 else "—" }}</td>
+          </tr>
+          <tr><td><strong>Key Traits</strong></td><td>{{ data.key_traits or "—" }}</td></tr>
+          <tr><td><strong>Shadows / Challenges</strong></td><td>{{ data.shadows or "—" }}</td></tr>
+        </tbody>
+      </table>
+
+    {% else %}
+      {# Fallback if there is no description #}
+      <table class="detail-table">
+        <tbody>
+          <tr><td><strong>Overview</strong></td><td>—</td></tr>
+          <tr><td><strong>Key Traits</strong></td><td>{{ data.key_traits or "—" }}</td></tr>
+          <tr><td><strong>Shadows / Challenges</strong></td><td>{{ data.shadows or "—" }}</td></tr>
+        </tbody>
+      </table>
+    {% endif %}
+
+  {% else %}
+    <p>No data found for Expression {{ number }}.</p>
+  {% endif %}
+  
+  <p style="margin-top:1.5rem;"><a href="{{ url_for('numerology.numerology_home') }}" class="secondary compact-button">← Back</a></p>
+</section>
+
+{# --- ADD THIS STYLE BLOCK --- #}
+<style>
+  .expression-subtitle {
+    font-size: 1.5rem; /* Larger font */
+    font-weight: 500;
+    font-style: italic; /* Makes it stand out */
+    color: var(--color-accent); /* Use your theme color */
+    text-align: center;
+    padding: 1rem;
+    margin: 0.5rem 0 1.5rem 0;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius);
+    line-height: 1.4;
+  }
+  
+  .numerology-detail .detail-table {
+    margin-top: 0; /* Remove top margin from table */
+  }
+</style>
+
+{% endblock %}

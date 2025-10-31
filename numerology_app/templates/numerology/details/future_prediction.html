@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Future Predictions{% endblock %}
+
+{% block content %}
+<main class="numerology-detail">
+  <h1>Future Predictions</h1>
+  <p class="subtitle">Based on your core numbers and today's date: {{ today_date }}</p>
+
+  <div class="prediction-grid">
+
+    <div class="prediction-card">
+      <div class="card-header">
+        <span class="card-number">{{ predictions.lucky_day }}</span>
+        <h3>Lucky Day Number</h3>
+      </div>
+      <div class="card-body">
+        {% if meanings.day %}
+          <p>{{ meanings.day.description }}</p>
+          <div class="color-box">
+            <strong>Lucky Color:</strong>
+            <span>{{ meanings.day.color }}</span>
+          </div>
+        {% else %}
+          <p>No meaning found for this number.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="prediction-card">
+      <div class="card-header">
+        <span class="card-number">{{ predictions.lucky_month }}</span>
+        <h3>Lucky Month Number</h3>
+      </div>
+      <div class="card-body">
+        {% if meanings.month %}
+          <p>{{ meanings.month.description }}</p>
+        {% else %}
+          <p>No meaning found for this number.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="prediction-card">
+      <div class="card-header">
+        <span class="card-number">{{ predictions.lucky_year }}</span>
+        <h3>Lucky Year Number</h3>
+      </div>
+      <div class="card-body">
+        {% if meanings.year %}
+          <p>{{ meanings.year.description }}</p>
+        {% else %}
+          <p>No meaning found for this number.</p>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+  <div style="text-align:center; margin-top:1.5rem;">
+    <a href="{{ url_for('numerology.numerology_home') }}" class="secondary compact-button">← Back</a>
+  </div>
+</main>
+
+<style>
+  .prediction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+  .prediction-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden; 
+    display: flex;
+    flex-direction: column;
+  }
+  .card-header {
+    background: var(--color-accent-light);
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .card-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-accent);
+  }
+  .card-number {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-accent);
+  }
+  .card-body {
+    padding: 1.5rem;
+    flex-grow: 1;
+  }
+  .card-body p {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .color-box {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--color-border);
+    font-size: 0.95rem;
+  }
+</style>
+{% endblock %}

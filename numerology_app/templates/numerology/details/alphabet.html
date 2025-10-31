@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Alphabet {{ letter }}{% endblock %}
+
+{% block content %}
+<section class="numerology-detail">
+  <h1>Alphabet Letter — {{ letter }}</h1>
+  
+  {% if data %}
+    <div class="description-content">
+      <p>{{ data.description or "No description available." }}</p>
+    </div>
+  {% else %}
+    <p>No data found for Alphabet Letter {{ letter }}.</p>
+  {% endif %}
+  
+  <p style="margin-top:1.5rem;"><a href="{{ url_for('numerology.numerology_home') }}" class="secondary compact-button">← Back</a></p>
+</section>
+
+<style>
+  .description-content {
+    background: var(--color-surface, #fff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: var(--radius, 8px);
+    padding: 1.5rem 2rem;
+    margin-top: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .description-content p {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin: 0;
+    white-space: pre-wrap; /* Preserves any line breaks in the DB text */
+  }
+</style>
+{% endblock %}

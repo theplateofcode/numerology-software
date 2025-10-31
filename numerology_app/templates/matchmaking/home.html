@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+{% block title %}Matchmaking Analysis{% endblock %} {# Updated title for clarity #}
+{% block content %}
+
+{% set accent = "#A18CD1" %}
+{% set accentLight = "#CBB7F0" %}
+{% set border = "#E7E1F7" %}
+{% set text = "#000000" %}
+{% set bg = "#FFFFFF" %}
+{% set subtle = "#FAF9FD" %}
+
+<header class="page-header">
+  <h1 class="page-title">Matchmaking</h1> {# Changed title text #}
+  <a href="/home" class="home-link">← Back to Home</a>
+</header>
+<div class="matchmaking-container">
+
+  <form method="POST" class="matchmaking-form">
+
+    <div class="input-section">
+      <div class="profile-box">
+        <h4>Profile 1</h4>
+        <div class="form-row">
+          <label for="p1_name">Name</label>
+          <input id="p1_name" type="text" name="p1_name" value="{{ request.form.p1_name or '' }}" required>
+        </div>
+        <div class="form-row">
+          <label for="p1_dob">DOB</label>
+          <input id="p1_dob" type="date" name="p1_dob" value="{{ request.form.p1_dob or '' }}" required>
+        </div>
+      </div>
+
+      <div class="profile-box">
+        <h4>Profile 2</h4>
+        <div class="form-row">
+          <label for="p2_name">Name</label>
+          <input id="p2_name" type="text" name="p2_name" value="{{ request.form.p2_name or '' }}" required>
+        </div>
+        <div class="form-row">
+          <label for="p2_dob">DOB</label>
+          <input id="p2_dob" type="date" name="p2_dob" value="{{ request.form.p2_dob or '' }}" required>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-accent">Generate</button>
+        <button type="reset" class="btn-clear">Clear</button>
+      </div>
+    </div>
+
+    {% if result %}
+    <div class="result-section">
+
+      <div class="result-header">
+        <h3>Matchmaking Compatibility</h3>
+        <span class="result-title">{{ result.title }}</span>
+      </div>
+
+      <div class="section">
+        <h4>Name Analysis</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Number</th>
+              <th>Friend</th>
+              <th>Same</th>
+              <th>Enemy</th>
+              <th>God</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ result.p1.name }}</td>
+              <td>{{ result.p1.num }}</td>
+              <td>{{ result.p1.friends|join(', ') }}</td>
+              <td>{{ result.p1.same|join(', ') }}</td>
+              <td>{{ result.p1.enemies|join(', ') }}</td>
+              <td>{{ result.p1.god }}</td>
+            </tr>
+            <tr>
+              <td>{{ result.p2.name }}</td>
+              <td>{{ result.p2.num }}</td>
+              <td>{{ result.p2.friends|join(', ') }}</td>
+              <td>{{ result.p2.same|join(', ') }}</td>
+              <td>{{ result.p2.enemies|join(', ') }}</td>
+              <td>{{ result.p2.god }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h4>Missing Analysis</h4>
+        <table>
+          <thead>
+            <tr>
+              <th>Profile</th>
+              <th>Missing No.</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ result.p1.name }}</td>
+              <td>{{ result.p1.missing_no or '—' }}</td>
+              <td>{{ result.p1.missing_details or '—' }}</td>
+            </tr>
+            <tr>
+              <td>{{ result.p2.name }}</td>
+              <td>{{ result.p2.missing_no or '—' }}</td>
+              <td>{{ result.p2.missing_details or '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section">
+        <h4>Crystal Suggestion</h4>
+        <div class="suggestion-box">
+          {{ result.crystal_suggestion or "No specific crystal suggestion found for this match." }}
+        </div>
+      </div>
+
+      <p class="note">
+        <strong>NOTE:</strong> If both 2 and 7 are missing in birth date, marriage or partnership may face challenges.
+      </p>
+    </div>
+    {% endif %}
+
+  </form>
+
+</div>
+
+<style>
+  /* NEW: Header Styles */
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem 1rem 1.5rem; /* Added padding */
+    margin: 1rem 1.5rem 0 1.5rem; /* Added margin */
+    border-bottom: 1px solid {{ border }};
+  }
+  .page-title {
+    margin: 0;
+    font-size: 1.5rem;
+    color: {{ accent }};
+  }
+  .home-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: {{ accent }};
+    text-decoration: none; /* Ensure no underline */
+  }
+  .home-link:hover {
+    color: var(--color-hover, #917BC5); /* Use theme variable if available */
+  }
+
+  body {
+    background: {{ subtle }};
+    color: {{ text }};
+    font-family: 'Roboto', sans-serif;
+    margin: 0; /* Ensure no default body margin */
+  }
+
+  .matchmaking-container {
+    background: {{ bg }};
+    border: 1px solid {{ border }};
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(161,140,209,0.15);
+    max-width: 950px;
+    margin: 20px auto; /* Centered with margin */
+  }
+
+  /* ... (rest of your existing styles remain unchanged) ... */
+  .input-section {
+    display: flex;
+    gap: 20px;
+    align-items: start;
+  }
+
+  .profile-box {
+    flex: 1;
+    border: 1px solid {{ border }};
+    border-radius: 8px;
+    padding: 12px;
+    background: {{ subtle }};
+  }
+
+  .profile-box h4 {
+    color: {{ accent }};
+    font-weight: 700;
+    margin: 0 0 10px 0;
+    display: inline-block;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+
+  label {
+    width: 70px;
+    font-weight: 600;
+    font-size: 12pt;
+    color: {{ accent }};
+  }
+
+  input[type="text"], input[type="date"] {
+    flex: 1;
+    border: 1px solid {{ border }};
+    border-radius: 6px;
+    padding: 6px 8px;
+    background: #fff;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .btn-accent {
+    background: {{ accent }};
+    border: none;
+    color: white;
+    padding: 8px 12px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Added transition */
+  }
+  .btn-accent:hover { background: var(--color-hover, #917BC5); } /* Changed hover effect */
+
+  .btn-clear {
+    background: {{ subtle }};
+    border: 1px solid {{ border }};
+    color: #333;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease; /* Added transition */
+  }
+   .btn-clear:hover { background: #e0e0e0; } /* Added hover */
+
+  .result-section {
+    margin-top: 25px;
+  }
+
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 2px solid {{ border }};
+    margin-bottom: 15px;
+  }
+
+  .result-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18pt;
+    color: {{ accent }};
+    margin: 0;
+  }
+
+  .result-title {
+    font-size: 13pt;
+    font-weight: 600;
+    color: {{ text }};
+  }
+
+  .section h4 {
+    color: {{ accent }};
+    font-size: 14pt;
+    font-weight: 700;
+    display: inline-block;
+    margin: 6px 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+    background: #fff;
+  }
+
+  th, td {
+    border: 1px solid {{ border }};
+    padding: 6px 8px;
+    text-align: left;
+  }
+
+  th {
+    background: {{ accentLight }};
+    font-weight: 700;
+    color: #111;
+  }
+
+  tr:nth-child(even) td {
+    background: {{ subtle }};
+  }
+
+  .suggestion-box {
+    background: {{ subtle }};
+    border: 1px solid {{ border }};
+    border-radius: 6px;
+    padding: 10px;
+    min-height: 40px;
+  }
+
+  .note {
+    font-size: 10.5pt;
+    color: #555;
+    margin-top: 15px;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,423 @@
+{% set accent = "#A18CD1" %}
+{% set accentLight = "#CBB7F0" %}
+{% set border = "#E7E1F7" %}
+{% set text = "#333333" %}
+{% set bg = "#FFFFFF" %}
+{% set subtle = "#FDFBFF" %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Numerology Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
+
+    /* === PAGE SETUP & BASE STYLES === */
+    @page { size: A4; margin: 15mm; }
+    * { box-sizing: border-box; }
+    html { font-size: 12pt; margin: 0; padding: 0; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: {{ text }};
+      background: {{ bg }};
+      line-height: 1.5;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0; padding: 0;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Playfair Display', serif;
+      color: {{ accent }};
+      margin: 0 0 0.75em;
+      font-weight: 700;
+    }
+    h1 { font-size: 2rem; }
+    h2 {
+      font-size: 1.6rem;
+      border-bottom: 2px solid {{ border }};
+      padding-bottom: 0.4em;
+      margin-bottom: 1em;
+    }
+    h3 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-top: 1px solid {{ border }}; padding-top: 1rem;}
+    h4 { font-size: 1.1rem; margin-bottom: 0.6em; font-weight: 700; }
+    p { margin: 0 0 1em; }
+    .muted { color: #777; }
+    .small { font-size: 0.85rem; }
+    .center { text-align: center; }
+    strong { font-weight: 700; }
+    .page-break { page-break-before: always; }
+
+    /* === NEW, FIXED COVER PAGE === */
+    .cover-page {
+      display: block; /* No flex */
+      text-align: center;
+      height: calc(297mm - 30mm); /* Full usable page height */
+      page-break-after: always;
+      background: {{ subtle }};
+      padding: 20mm 20mm 15mm 20mm;
+      position: relative; /* For absolute footer */
+    }
+    .cover-header {
+      padding-top: 20mm; /* Space from top */
+    }
+    .cover-logo {
+      max-width: 100px;
+      height: auto;
+      border-radius: 50%;
+      border: 3px solid {{ accentLight }};
+      margin-bottom: 1.5rem;
+    }
+    .cover-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      color: {{ accent }};
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+    .cover-report-title {
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.3rem;
+      color: {{ text }};
+      margin-bottom: 40mm; /* Pushes client box down */
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    /* "Prepared For" box */
+    .client-details-box {
+      border: 1px solid {{ border }};
+      border-radius: 8px;
+      padding: 1.5rem 2rem;
+      text-align: center;
+      background: {{ bg }}; /* White background */
+      width: 100%;
+      max-width: 450px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      margin: 0 auto; /* Center the box */
+    }
+    .client-details-label {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: {{ accent }};
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid {{ border }};
+      padding-bottom: 0.5rem;
+    }
+    .client-details-name {
+      font-family: 'Roboto', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: {{ text }};
+      margin-bottom: 0.5rem;
+    }
+    .client-details-dob {
+      font-size: 1.1rem;
+      color: #555;
+    }
+    .cover-footer {
+      position: absolute; /* Anchors to bottom of page */
+      bottom: 15mm;
+      left: 15mm;
+      right: 15mm;
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    /* === DATA PAGES (Page 2+) === */
+    .main-content { }
+    .section { margin: 0; }
+    .card {
+      border: 1px solid {{ border }};
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1rem;
+      page-break-inside: avoid;
+    }
+    .card h2 { margin-top: 0.2em; margin-bottom: 1em; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
+
+    /* Life Path Grid Styles */
+    .kv-long-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; color: {{ accent }}; font-weight: 700; margin-top: 0; margin-bottom: 0.3rem; }
+    .kv-long-value { margin: 0 0 1.2rem 0; }
+    .kv-grid { display: grid; gap: 1rem; }
+    .kv-grid-2 { grid-template-columns: 1fr 1fr; }
+    .kv-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .kv-item { background: {{ subtle }}; padding: 10px 12px; border-radius: 6px; border: 1px solid {{ border }}; }
+    .kv-item .k { display: block; font-size: 0.9rem; color: {{ accent }}; font-weight: 700; margin-bottom: 4px; }
+    .kv-item .v { display: block; font-size: 1rem; color: {{ text }}; font-weight: 500; }
+    
+    /* Table Styling */
+    table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+    th, td { border: 1px solid {{ border }}; padding: 0.6rem 0.8rem; vertical-align: top; text-align: left; }
+    th { background: {{ accentLight }}; font-weight: 700; color: #333; }
+    tr:nth-child(even) td { background: {{ subtle }}; }
+
+    /* Karmic Grid */
+    .karmic td { text-align: center; font-weight: 700; font-size: 1.3rem; background: {{ subtle }}; height: 55px; }
+
+    /* Karmic Lines */
+    .line-box { border-left: 4px solid {{ accentLight }}; padding-left: 10px; margin: 0.5rem 0 1rem; }
+    .line-box.negative { border-left-color: #E57373; }
+    h4.line-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    h4.positive { color: #1B5E20; }
+    h4.negative { color: #C62828; }
+    .legend { font-size: 0.85rem; color: #555; background: {{ subtle }}; padding: 8px 12px; border-radius: 6px; border: 1px solid {{ border }}; margin-bottom: 1rem; }
+    .legend .line-box, .legend .line-box.negative { display: inline-block; width: 20px; height: 10px; margin-right: 5px; padding: 0; border-left-width: 10px; vertical-align: middle; }
+    
+    .footer { font-size: 0.85rem; color: #999; text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid {{ border }}; }
+    
+    .missing-data-box { background: {{ subtle }}; border: 1px dashed #E57373; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
+    .missing-data-box p { color: #666; margin: 0; font-size: 10pt; }
+  </style>
+</head>
+<body>
+
+  <div class="cover-page">
+    <div class="cover-header">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="cover-logo" onerror="this.src='https://placehold.co/100x100/E7E1F7/A18CD1?text=Logo&font=roboto'">
+      <div class="cover-brand">Numerology by Neha</div>
+      <div class="cover-report-title">Personal Numerology Report</div>
+    </div>
+
+    {% if person %}
+    <div class="client-details-box">
+      <div class="client-details-label">PREPARED FOR</div>
+      <p class="client-details-name">
+        {{ person.get('first_name','') }} {{ person.get('last_name','') }}
+      </p>
+      <p class="client-details-dob" style="margin:0;">
+        Date of Birth: {{ person.get('dob','') }}
+      </p>
+    </div>
+    {% endif %}
+
+    <div class="cover-footer">
+      Generated on {{ generated_at.strftime("%d %B %Y") if generated_at else "" }} <br>
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <section class="section">
+      <div class="card">
+        <h2>Life Path {% if life_path_no %}{{ life_path_no }}{% endif %}</h2>
+        {% if life_path %}
+          <h4 class="kv-long-title">Personality</h4>
+          <p class="kv-long-value">{{ life_path.personality or "—" }}</p>
+          <h4 class="kv-long-title">Thinking</h4>
+          <p class="kv-long-value">{{ life_path.thinking or "—" }}</p>
+
+          <h3>Lucky Elements</h3>
+          <div class="kv-grid kv-grid-3">
+            <div class="kv-item"><span class="k">Planet</span><span class="v">{{ life_path.planet or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Deity</span><span class="v">{{ life_path.god or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Mantra</span><span class="v">{{ life_path.mantra or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Dates</span><span class="v">{{ life_path.lucky_date or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Days</span><span class="v">{{ life_path.lucky_days or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Years</span><span class="v">{{ life_path.lucky_years or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Direction</span><span class="v">{{ life_path.lucky_direction or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Colour</span><span class="v">{{ life_path.lucky_color or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Stone</span><span class="v">{{ life_path.stone or "—" }}</span></div>
+          </div>
+          
+          <h3>Relationships</h3>
+          <div class="kv-grid kv-grid-3">
+            <div class="kv-item"><span class="k">Good Marriage</span><span class="v">{{ life_path.lucky_marriage or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Mitraank (Friends)</span><span class="v">{{ life_path.mitraank or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Samaank (Neutral)</span><span class="v">{{ life_path.samaank or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Shatruaank (Enemies)</span><span class="v">{{ life_path.satraank or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Unlucky Colour</span><span class="v">{{ life_path.unlucky_color or "—" }}</span></div>
+          </div>
+
+          <h3>Other Details</h3>
+          <div class="kv-grid kv-grid-2">
+            <div class="kv-item"><span class="k">Good Business</span><span class="v">{{ life_path.lucky_business or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Potential Illness</span><span class="v">{{ life_path.illness or "—" }}</span></div>
+          </div>
+          
+        {% else %}
+        <p class="muted center">Detailed information for this Life Path number is not available.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section page-break">
+      <div class="card">
+        <h2>Name &amp; Personality Numbers</h2>
+
+        <h3>Expression {% if expression_no %}{{ expression_no }}{% endif %}</h3>
+        {% if life_expression %}
+        <div class="mb12">
+          <h4>Description</h4>
+          <p>{{ life_expression.description or "—" }}</p>
+        </div>
+        <div class="mb12">
+          <h4>Key Traits</h4>
+          <p>{{ life_expression.key_traits or "—" }}</p>
+        </div>
+        <div>
+          <h4>Shadows</h4>
+          <p>{{ life_expression.shadows or "—" }}</p>
+        </div>
+        {% else %}
+        <p class="muted center">Detailed information for this Expression number is not available.</p>
+        {% endif %}
+
+        <h3>Soul Urge {% if soul_urge_no %}{{ soul_urge_no }}{% endif %}</h3>
+        {% if soul_urge %}
+        <h4>Description</h4>
+        <p>{{ soul_urge.description or "—" }}</p>
+        {% else %}
+        <p class="muted center">Detailed information for this Soul Urge number is not available.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section page-break">
+      <div class="card mb12">
+        <h2>Birthday &amp; Alphabet Insights</h2>
+        <h3>Birthday {% if birthday_no %}{{ birthday_no }}{% endif %}</h3>
+        {% if birthday %}
+        <div class="mb12">
+          <h4>Description</h4>
+          <p>{{ birthday.description or "—" }}</p>
+        </div>
+        {% else %}
+        <p class="muted center">Detailed information for this Birthday number is not available.</p>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <h3>First Alphabet {% if first_alpha %}{{ first_alpha }}{% endif %}</h3>
+        {% if alphabet %}
+        <h4>Description</h4>
+        <p>{{ alphabet.description or "—" }}</p>
+        {% else %}
+        <p class="muted center">Detailed information for this Alphabet letter is not available.</p>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="section page-break">
+      <div class="card">
+        <h2>Karmic Details</h2>
+        <div class="grid-2">
+          <div>
+            <h3>Karmic Chart</h3>
+            {% if karmic and karmic.chart %}
+            <table class="karmic">
+              <tbody>
+                {% for row in [[3,6,9],[2,5,8],[1,4,7]] %}
+                <tr>
+                  {% for n in row %}
+                  {% set count = karmic.chart.get(n, karmic.chart.get(n|string, 0)) or 0 %}
+                  <td>
+                    {% if count > 0 %} {{ (n|string) * count }} {% else %} &nbsp; {% endif %}
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            {% else %}
+            <p class="muted center">Karmic chart data is not available.</p>
+            {% endif %}
+          </div>
+
+          <div>
+            <h3>Karmic Lines</h3>
+            <div class="legend mb12">
+              <span class="line-box"></span> <strong>Positive Line:</strong> Indicates strengths.<br>
+              <span class="line-box negative"></span> <strong>Negative Line:</strong> Indicates challenges.
+            </div>
+
+            {% if positive_line_rows %}
+            <h4 class="mb4 positive">Positive Lines Present</h4>
+            {% for ln in positive_line_rows %}
+            <div class="line-box">
+              <div><strong>{{ ln.line_name }} ({{ ln.numbers }})</strong></div>
+              <div class="small mt8">{{ ln.description or "—" }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="missing-data-box" style="padding: 10px;">
+                <p class="small" style="margin:0;">No positive lines found.</p>
+            </div>
+            {% endif %}
+
+            {% if negative_line_rows %}
+            <h4 class="mb4 mt12 negative">Negative Lines (Challenges)</h4>
+            {% for ln in negative_line_rows %}
+            <div class="line-box negative">
+              <div><strong>{{ ln.line_name }} ({{ ln.numbers }})</strong></div>
+              <div class="small mt8">{{ ln.description or "—" }}</div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="missing-data-box" style="padding: 10px; margin-top: 1rem;">
+                <p class="small" style="margin:0;">No negative lines found.</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section page-break">
+      <div class="card">
+          <h2>Repeating &amp; Missing Numbers</h2>
+          <div class="grid-2">
+              <div>
+                  <h3>Repeating Numbers</h3>
+                  {% if repeating_rows %}
+                  <table>
+                    <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
+                    <tbody>
+                      {% for r in repeating_rows %}
+                      <tr>
+                        <td class="center"><strong>{{ r.number }}</strong></td>
+                        <td class="center">{{ r.value }}</td>
+                        <td>{{ r.meaning or "—" }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% else %}
+                  <p class="muted center">No significantly repeating numbers found.</p>
+                  {% endif %}
+              </div>
+
+              <div>
+                  <h3>Missing Numbers</h3>
+                  {% if missing_rows %}
+                  <table>
+                    <thead><tr><th>Number</th><th>Description</th></tr></thead>
+                    <tbody>
+                      {% for m in missing_rows %}
+                      <tr>
+                        <td class="center"><strong>{{ m.number }}</strong></td>
+                        <td>{{ m.details or "—" }}</td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% else %}
+                  <p class="muted center">No missing numbers found.</p>
+                  {% endif %}
+              </div>
+          </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+      End of Report • Generated by Numerology by Neha
+    </footer>
+
+  </div></body>
+</html>
