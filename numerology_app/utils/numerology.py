@@ -26,6 +26,14 @@ def reduce_to_single_digit(num: int) -> int:
         num = sum(int(d) for d in str(num))
     return num
 
+def reduce_to_single_digit_life_path(num: int) -> int:
+    """
+    Reduce a number to a single digit unless it’s a master number (11, 22, 33).
+    """
+    while num > 9:
+        num = sum(int(d) for d in str(num))
+    return num
+
 
 def letters_to_numbers(name: str, mapping: dict) -> list[int]:
     """
@@ -57,7 +65,7 @@ def life_path(dob: str) -> int:
 
     # Add them
     total = day + month + year
-    return reduce_to_single_digit(total)
+    return reduce_to_single_digit_life_path(total)
 
 
 def expression_number(full_name: str, mapping: dict) -> int:
