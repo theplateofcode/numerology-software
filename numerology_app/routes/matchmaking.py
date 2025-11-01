@@ -1,9 +1,16 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, session, redirect, url_for
 from numerology_app.utils import numerology
 from numerology_app.models import MissingNumber, LifePath
 from numerology_app import db
 
 matchmaking_bp = Blueprint("matchmaking", __name__, url_prefix="/matchmaking")
+
+@matchmaking_bp.before_request
+def require_login():
+    """Gatekeeper for all routes in this blueprint."""
+    if "user" not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for("auth.login"))
 
 @matchmaking_bp.route("/", methods=["GET", "POST"], endpoint="matchmaking_home")
 def matchmaking_home():
@@ -27,14 +34,14 @@ def matchmaking_home():
 
         # --- Compatibility lookup ---
         compat_lookup = {
-            "1": {"friends": [2, 4], "same": [1, 5, 7], "enemies": [8, 9], "god": "Surya"},
-            "2": {"friends": [4, 6], "same": [2, 5, 8], "enemies": [7, 9], "god": "Chandra"},
+            "1": {"friends": [4, 8], "same": [2, 3, 7, 9], "enemies": [5, 6], "god": "Surya"},
+            "2": {"friends": [7, 9], "same": [1, 3, 4, 6], "enemies": [5, 8], "god": "Chandra"},
             "3": {"friends": [6, 9], "same": [1, 2, 5, 7], "enemies": [4, 8], "god": "Vishnu"},
-            "4": {"friends": [1, 8], "same": [2, 4, 6], "enemies": [3, 5, 9], "god": "Rahu"},
-            "5": {"friends": [1, 3, 6, 9], "same": [2, 5, 8], "enemies": [4, 7], "god": "Mercury"},
-            "6": {"friends": [3, 9], "same": [2, 5, 8], "enemies": [1, 7], "god": "Venus"},
-            "7": {"friends": [2, 5], "same": [1, 4, 7], "enemies": [6, 9], "god": "Ketu"},
-            "8": {"friends": [1, 4], "same": [5, 8], "enemies": [2, 3, 9], "god": "Shani"},
+            "4": {"friends": [1, 8], "same": [2, 6, 7, 9], "enemies": [3, 5], "god": "Laxmi"},
+            "5": {"friends": [3, 9], "same": [1, 6, 7, 8], "enemies": [2, 4], "god": "Devi"},
+            "6": {"friends": [3, 9], "same": [2, 4, 5, 7], "enemies": [1, 8], "god": "Narsinh"},
+            "7": {"friends": [2, 6], "same": [3, 4, 5, 8], "enemies": [1, 9], "god": "Bhairav"},
+            "8": {"friends": [1, 4], "same": [2, 5, 7, 9], "enemies": [3, 6], "god": "Hanuman"},
             "9": {"friends": [3, 6], "same": [2, 4, 5, 8], "enemies": [1, 7], "god": "Hanuman"},
         }
 
@@ -50,14 +57,16 @@ def matchmaking_home():
         # MISSING NUMBERS (Reuse Numerology Logic)
         # --------------------
         def find_missing_numbers(name, dob):
-            full_numbers = numerology.get_all_numbers_from_name_and_dob(name, dob)
-            missing_list = [n for n in range(1, 10) if n not in full_numbers]
+            # This function might need to be defined in numerology.py if it isn't already
+            # For now, assuming it's available or logic is here
+            missing_list_str = numerology.missing_numbers(dob) # Assumes this returns a list of strings/ints
+            missing_list = [str(m) for m in missing_list_str]
 
             missing_rows = MissingNumber.query.filter(
-                MissingNumber.number.in_([str(m) for m in missing_list])
+                MissingNumber.number.in_(missing_list)
             ).order_by(MissingNumber.number).all()
 
-            missing_text = ", ".join([str(m) for m in missing_list]) or "None"
+            missing_text = ", ".join(missing_list) or "None"
             missing_details = "; ".join([f"{row.number}: {row.details}" for row in missing_rows]) or "No missing numbers."
 
             return missing_text, missing_details

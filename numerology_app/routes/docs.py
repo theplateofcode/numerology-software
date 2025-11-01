@@ -1,16 +1,23 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from numerology_app import db
 from numerology_app.models import (
     LifePath, LifeExpression, SoulUrge,
     BirthdayDetails, AlphabetDetails,
     RepeatingNumber, MissingNumber,
-    KarmicLineMeaning  # <<< CHANGED
+    KarmicLineMeaning,
+    LuckyYearMonthMeaning, LuckyDayMeaning
 )
 
 docs_bp = Blueprint("docs", __name__, url_prefix="/docs")
 
+@docs_bp.before_request
+def require_login():
+    """Gatekeeper for all routes in this blueprint."""
+    if "user" not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for("auth.login"))
+
 # A dictionary mapping table names to their models
-# This avoids repeating the same dictionary in every route
 MODEL_MAP = {
     "life_path": LifePath,
     "life_expression": LifeExpression,
@@ -19,12 +26,13 @@ MODEL_MAP = {
     "alphabet": AlphabetDetails,
     "repeating": RepeatingNumber,
     "missing": MissingNumber,
-    "karmic_lines": KarmicLineMeaning  # <<< CHANGED
+    "karmic_lines": KarmicLineMeaning,
+    "lucky_year_month": LuckyYearMonthMeaning,
+    "lucky_day": LuckyDayMeaning
 }
 
 @docs_bp.route("/", methods=["GET"])
 def docs_home():
-    # Build the data dictionary by querying all models in the map
     data = {
         table_name: model.query.all()
         for table_name, model in MODEL_MAP.items()
@@ -40,7 +48,6 @@ def get_entry(table, item_id):
         return jsonify({"error": "Table not found"}), 404
         
     record = model.query.get_or_404(item_id)
-    # Serialize the record to JSON
     return jsonify({col.name: getattr(record, col.name) for col in record.__table__.columns})
 
 
@@ -55,7 +62,6 @@ def edit_entry(table, item_id):
     
     for key, val in request.form.items():
         if hasattr(record, key):
-            # Handle potential type mismatches, e.g., for Integer fields
             try:
                 setattr(record, key, val)
             except Exception as e:
@@ -70,5 +76,4 @@ def edit_entry(table, item_id):
         db.session.rollback()
         flash(f"Database error on update: {e}", "error")
 
-    # Redirect back to the docs home, anchoring to the section you just edited
-    return redirect(url_for("docs.docs_home") + f"#{table}")
+    return redirect(url_for("docs.docs_home"))

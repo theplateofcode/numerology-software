@@ -131,6 +131,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    color: #cbb7f0;
   }
   .actions-btn:hover { background: var(--color-bg); }
   .actions-btn .arrow-down { font-size: 0.7rem; transform: scaleY(0.8); }
@@ -155,13 +156,15 @@
     text-align: left;
     padding: 8px 12px;
     border: none;
-    background: none;
+    background: #ffffff;
     cursor: pointer;
     font-size: 0.9rem;
     border-radius: 4px;
   }
-  .action-item:hover { background: var(--color-bg); color: var(--color-accent); }
-  .action-item.delete-btn:hover { background: #FFF0F0; color: #D8000C; }
+  .action-item:hover { background: #cacaca; color: var(--color-accent); }
+  .action-item.delete-btn { background: #ffffff; color: #D8000C; }
+  .action-item.edit-btn { background: #ffffff; color: #585858; }
+
 
   /* --- NEW: Modal Styles --- */
   .modal {

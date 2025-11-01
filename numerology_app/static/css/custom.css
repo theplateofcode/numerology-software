@@ -31,7 +31,7 @@ input, select, textarea {
   /* Use the variables defined above */
   --pico-background-color: var(--pico-form-element-background-color);
   --pico-border-color: var(--pico-form-element-border-color);
-  --pico-color: var(--pico-form-element-color); /* Overrides the purple from :root */
+  --pico-color: #4f4f4f; /* Overrides the purple from :root */
   --pico-box-shadow: none;
 
   /* Apply the styles */

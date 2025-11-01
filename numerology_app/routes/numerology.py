@@ -1,15 +1,27 @@
 # numerology_app/routes/numerology.py
 
-from flask import Blueprint, render_template, request, session, redirect, url_for, Response, current_app
+from flask import (
+    Blueprint, render_template, request, session, 
+    redirect, url_for, Response, current_app, flash
+)
 from numerology_app.utils import numerology
 from numerology_app import db
 from numerology_app.models import (
     LifePath, LifeExpression, SoulUrge, BirthdayDetails, AlphabetDetails,
     RepeatingNumber, MissingNumber, KarmicLineMeaning, Client,
+    LuckyDayMeaning, LuckyYearMonthMeaning
 )
 from datetime import datetime
 
 numerology_bp = Blueprint("numerology", __name__, url_prefix="/numerology")
+
+@numerology_bp.before_request
+def require_login():
+    """Gatekeeper for all routes in this blueprint."""
+    if "user" not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for("auth.login"))
+
 
 @numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
 def numerology_home():
@@ -61,16 +73,21 @@ def numerology_home():
     clients = Client.query.order_by(Client.created_at.desc()).all()
     return render_template("numerology/home.html", results=results, clients=clients)
 
+@numerology_bp.route("/clear", methods=["GET"])
+def clear_session():
+    """
+    Clears the numerology results and input from the session and redirects
+    back to the home page, effectively resetting it.
+    """
+    session.pop("numerology_results", None)
+    session.pop("numerology_input", None)
+    return redirect(url_for("numerology.numerology_home"))
+# ---------------------------
 
 def _active_lines_from_chart(karmic_chart_dict):
     """
     Returns (positive_line_codes, negative_line_codes) based on the Lo Shu chart counts.
-    - positive line = all numbers in the line are present (>0)
-    - negative line = all numbers in the line are missing (=0)
     """
-    
-    # --- THIS IS THE FIX ---
-    # The codes are changed from '123' to '1-2-3' to match your database query format.
     lines = [
         ('1-2-3', [1, 2, 3]),
         ('4-5-6', [4, 5, 6]),
@@ -81,7 +98,6 @@ def _active_lines_from_chart(karmic_chart_dict):
         ('1-5-9', [1, 5, 9]),
         ('3-5-7', [3, 5, 7]),
     ]
-    # --- END OF FIX ---
 
     chart = karmic_chart_dict.get("chart", {}) if karmic_chart_dict else {}
     def count(n):  # handles int keys and string keys
@@ -134,7 +150,7 @@ def _fetch_lookup_details(results):
 
     repeating_rows = []
     if repeating:
-        for k, v in repeating.items():  # k is number, v is count or representation
+        for k, v in repeating.items():  # k is number, v is count
             row = RepeatingNumber.query.filter_by(number=str(k)).first()
             repeating_rows.append({
                 "number": str(k),
@@ -144,20 +160,20 @@ def _fetch_lookup_details(results):
 
     # Karmic chart + lines
     karmic = results.get('karmic_chart') or {}
-    pos_codes, neg_codes = _active_lines_from_chart(karmic) # This now returns ['1-2-3'], etc.
+    pos_codes, neg_codes = _active_lines_from_chart(karmic) 
 
     pos_lines = []
     if pos_codes:
         pos_lines = KarmicLineMeaning.query.filter(
             KarmicLineMeaning.line_type == 'positive',
-            KarmicLineMeaning.numbers.in_(pos_codes) # This query will now work
+            KarmicLineMeaning.numbers.in_(pos_codes)
         ).order_by(KarmicLineMeaning.numbers).all()
 
     neg_lines = []
     if neg_codes:
         neg_lines = KarmicLineMeaning.query.filter(
             KarmicLineMeaning.line_type == 'negative',
-            KarmicLineMeaning.numbers.in_(neg_codes) # This query will now work
+            KarmicLineMeaning.numbers.in_(neg_codes)
         ).order_by(KarmicLineMeaning.numbers).all()
 
     return {
@@ -174,8 +190,8 @@ def _fetch_lookup_details(results):
         "alphabet": alphabet,
 
         "karmic": karmic,
-        "positive_line_rows": pos_lines,  # This will now contain data
-        "negative_line_rows": neg_lines,  # This will now contain data
+        "positive_line_rows": pos_lines,
+        "negative_line_rows": neg_lines,
 
         "missing_rows": missing_rows,
         "repeating_rows": repeating_rows,

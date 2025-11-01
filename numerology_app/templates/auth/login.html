@@ -29,138 +29,323 @@
       <button type="submit" class="login-button">Login</button>
     </form>
     
+    <div class="change-password-link">
+        <a href="#" id="changePasswordBtn">Change Password</a>
+    </div>
+    
   </div>
 </div>
 
+<div id="passwordModal" class="modal-backdrop" style="display: none;">
+  <div class="modal-content">
+    <span class="modal-close-button">&times;</span>
+    <h3>Change Password</h3>
+    
+    <form id="changePasswordForm">
+      <div class="form-group">
+        <label for="previous_password">Previous Password</label>
+        <input id="previous_password" type="password" name="previous_password" required>
+      </div>
+      <div class="form-group">
+        <label for="new_password">New Password</label>
+        <input id="new_password" type="password" name="new_password" required>
+      </div>
+      
+      <div id="modalMessage" class="modal-message"></div>
+      
+      <div class="modal-actions">
+        <button type="button" class="btn-clear modal-cancel-btn">Cancel</button>
+        <button type="submit" class="btn-accent">Save Password</button>
+      </div>
+    </form>
+    
+  </div>
+</div>
+
+
 <style>
-  /* Ensure the container takes full screen height */
-  html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-  }
-  .cover-logo {
-      max-width: 100px;
-      height: auto;
-      border-radius: 50%;
-      border: 3px solid {{ accentLight }} ;
-      margin-bottom: 1.5rem;
-    }
-  .login-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    width: 100%;
-    /* MODIFIED: Subtle gradient background */
-    background: linear-gradient(135deg, var(--color-bg, #F7F5FB) 0%, #EDE9F6 100%);
-  }
+  /* --- NEW: Import "Royal" Font --- */
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap');
 
-  .login-card {
-    background-color: var(--color-surface, #FFFFFF);
-    padding: 2.5rem 3rem;
-    border-radius: var(--radius, 12px);
-    box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,0.1)); /* Slightly stronger shadow */
-    border: 1px solid var(--color-border, #E7E1F7);
-    width: 100%;
-    max-width: 450px; /* Slightly wider */
-    text-align: center;
+  /* --- STYLES FOR LOGIN PAGE --- */
+  html, body { 
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+    font-family: 'Roboto', sans-serif; /* NEW: Base font */
   }
   
-  /* NEW: Logo Placeholder Style */
-  .logo-placeholder {
-      width: 60px;
-      height: 60px;
-      background: var(--color-accent-light, #CBB7F0);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--color-accent, #A18CD1);
-      margin: 0 auto 1.5rem auto; /* Center and add space below */
-      font-family: 'Playfair Display', serif; /* Optional: Use royal font */
-  }
-
-  .login-header h1 {
-    margin: 0 0 0.5rem 0;
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--color-accent, #A18CD1);
+  .cover-logo { 
+    max-width: 100px; 
+    height: auto; 
+    border-radius: 50%; 
+    border: 3px solid var(--color-accent-light, #CBB7F0); 
+    margin-bottom: 1.5rem; 
   }
   
-  .login-header p {
-      margin-bottom: 2rem;
-      color: var(--color-text, #636363);
-  }
-
-  .login-form .form-group {
-    margin-bottom: 1.25rem;
-    text-align: left;
+  .login-container { 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    min-height: 100vh; 
+    width: 100%; 
+    background: linear-gradient(135deg, var(--color-bg, #F7F5FB) 0%, #EDE9F6 100%); 
   }
   
-  .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      font-size: 0.9rem;
-      color: #555; /* Slightly darker label */
+  .login-card { 
+    background-color: var(--color-surface, #FFFFFF); 
+    padding: 2.5rem 3rem; 
+    border-radius: var(--radius, 12px); 
+    box-shadow: var(--shadow, 0 6px 20px rgba(0,0,0,0.1)); 
+    border: 1px solid var(--color-border, #E7E1F7); 
+    width: 100%; 
+    max-width: 450px; 
+    text-align: center; 
   }
 
-  .login-form input {
-    width: 100%;
-    padding: 0.8rem; /* Slightly larger padding */
-    font-size: 1rem;
-    border: 1px solid var(--color-border, #E7E1F7);
-    border-radius: var(--radius, 8px);
+  .login-header h1 { 
+    margin: 0 0 0.5rem 0; 
+    font-size: 2rem; 
+    font-weight: 700; 
+    color: var(--color-accent, #A18CD1); 
+    font-family: 'Playfair Display', serif; /* MODIFIED: Royal font */
+  }
+  
+  .login-header p { 
+    margin-bottom: 2rem; 
+    color: var(--color-text, #636363); 
+  }
+  
+  /* Shared form styles for login and modal */
+  .form-group { 
+    margin-bottom: 1.25rem; 
+    text-align: left; 
+  }
+  .form-group label { 
+    display: block; 
+    font-weight: 600; 
+    margin-bottom: 0.5rem; 
+    font-size: 0.9rem; 
+    color: #555; 
+  }
+  
+  /* Style all inputs (in login AND modal) */
+  .login-form input,
+  .modal-content input[type="password"] { 
+    width: 100%; 
+    padding: 0.8rem; 
+    font-size: 1rem; 
+    border: 1px solid var(--color-border, #E7E1F7); 
+    border-radius: var(--radius, 8px); 
     box-sizing: border-box; 
-    transition: all 0.2s ease;
-    background-color: #FAFAFC; /* Slightly off-white input */
-  }
-
-  .login-form input:focus {
-    outline: none;
-    border-color: var(--color-accent, #A18CD1);
-    /* MODIFIED: Enhanced focus shadow */
-    box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.25); 
-    background-color: #fff; /* White on focus */
+    transition: all 0.2s ease; 
+    background-color: #FAFAFC; 
   }
   
-  .error-message {
-      color: #D8000C; 
-      background-color: #FFD2D2; 
-      border: 1px solid #D8000C;
-      padding: 0.75rem;
-      border-radius: var(--radius, 8px);
-      margin-top: 1.5rem;
-      margin-bottom: 0;
-      font-size: 0.9rem; /* Slightly smaller error text */
+  .login-form input:focus,
+  .modal-content input[type="password"]:focus { 
+    outline: none; 
+    border-color: var(--color-accent, #A18CD1); 
+    box-shadow: 0 0 0 4px rgba(161, 140, 209, 0.25); 
+    background-color: #fff; 
+  }
+  
+  .error-message { 
+    color: #D8000C; 
+    background-color: #FFD2D2; 
+    border: 1px solid #D8000C; 
+    padding: 0.75rem; 
+    border-radius: var(--radius, 8px); 
+    margin-top: 1.5rem; 
+    margin-bottom: 0; 
+    font-size: 0.9rem; 
+  }
+  
+  .login-button { 
+    width: 100%; 
+    padding: 0.9rem; 
+    font-size: 1.1rem; 
+    font-weight: 700; 
+    color: white; 
+    background-color: var(--color-accent, #A18CD1); 
+    border: none; 
+    border-radius: var(--radius, 8px); 
+    cursor: pointer; 
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease; 
+    margin-top: 1.5rem; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+  }
+  .login-button:hover { 
+    background-color: var(--color-hover, #917BC5); 
+    transform: translateY(-2px); 
+  }
+  .login-button:active { 
+    transform: translateY(0); 
+  }
+  
+  /* Change Password Link Style */
+  .change-password-link {
+    margin-top: 1.5rem;
+    padding-top: 1rem; /* NEW */
+    border-top: 1px solid var(--color-border, #E7E1F7); /* NEW */
+  }
+  .change-password-link a { 
+    color: var(--color-text, #636363); 
+    font-size: 0.9rem; 
+    text-decoration: none; 
+  }
+  .change-password-link a:hover { 
+    color: var(--color-accent, #A18CD1); 
+    text-decoration: underline; 
   }
 
-  .login-button {
+  /* --- STYLES FOR MODAL --- */
+  .modal-backdrop {
+    position: fixed; top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: var(--color-surface, #FFFFFF);
+    padding: 2rem 2.5rem;
+    border-radius: var(--radius, 12px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     width: 100%;
-    padding: 0.9rem; /* Slightly larger padding */
-    font-size: 1.1rem;
-    font-weight: 700; /* Bolder text */
-    color: white;
-    background-color: var(--color-accent, #A18CD1);
+    max-width: 400px;
+    position: relative;
+  }
+  .modal-close-button {
+    position: absolute; top: 10px; right: 20px;
+    font-size: 2rem; color: #aaa;
+    cursor: pointer;
+  }
+  .modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    color: var(--color-accent, #A18CD1);
+    text-align: center;
+    font-family: 'Playfair Display', serif; /* MODIFIED: Royal font */
+  }
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .btn-accent, .btn-clear {
+    padding: 0.6rem 1.2rem;
     border: none;
     border-radius: var(--radius, 8px);
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease; /* Added transform */
-    margin-top: 1.5rem;
-    text-transform: uppercase; /* Uppercase text */
-    letter-spacing: 0.5px; /* Added letter spacing */
+    font-size: 0.9rem;
   }
+  .btn-accent { background: var(--color-accent); color: white; }
+  .btn-accent:hover { background: var(--color-hover); }
+  .btn-clear { background: #eee; color: #555; border: 1px solid #ccc; }
+  .btn-clear:hover { background: #ddd; }
   
-  .login-button:hover {
-      background-color: var(--color-hover, #917BC5);
-      transform: translateY(-2px); /* Slight lift on hover */
+  .modal-message {
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    border-radius: var(--radius, 8px);
+    margin-top: 1rem;
+    display: none; 
   }
-  .login-button:active {
-       transform: translateY(0); /* Press down effect */
-  }
+  .modal-message.success { background: #E6F7E9; color: #1B5E20; border: 1px solid #B7E1CD; }
+  .modal-message.error { background: #FFD2D2; color: #D8000C; border: 1px solid #D8000C; }
 
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    
+    // --- Get all modal elements ---
+    const modal = document.getElementById("passwordModal");
+    const openBtn = document.getElementById("changePasswordBtn");
+    const closeBtn = modal.querySelector(".modal-close-button");
+    const cancelBtn = modal.querySelector(".modal-cancel-btn");
+    const passwordForm = document.getElementById("changePasswordForm");
+    const messageEl = document.getElementById("modalMessage");
+
+    // --- Functions to show/hide modal ---
+    function showModal() {
+        modal.style.display = "flex";
+        passwordForm.reset(); // Clear form fields
+        messageEl.style.display = "none"; // Hide any old messages
+    }
+    
+    function hideModal() {
+        modal.style.display = "none";
+    }
+
+    // --- Event Listeners ---
+    openBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        showModal();
+    });
+    
+    closeBtn.addEventListener("click", hideModal);
+    cancelBtn.addEventListener("click", hideModal);
+    
+    // Hide modal if user clicks on the dark backdrop
+    modal.addEventListener("click", function(e) {
+        if (e.target === modal) {
+            hideModal();
+        }
+    });
+
+    // --- Handle the form submission ---
+    passwordForm.addEventListener("submit", function(e) {
+        e.preventDefault(); // Stop the form from reloading the page
+        
+        const formData = new FormData(passwordForm);
+        const saveButton = passwordForm.querySelector(".btn-accent");
+        
+        // Disable save button
+        saveButton.disabled = true;
+        saveButton.textContent = "Saving...";
+        
+        // Send the data to the server
+        fetch("{{ url_for('auth.change_password') }}", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show SUCCESS message
+                messageEl.textContent = data.message;
+                messageEl.className = "modal-message success";
+                messageEl.style.display = "block";
+                passwordForm.reset();
+                
+                // Hide modal after 2 seconds
+                setTimeout(hideModal, 2000);
+            } else {
+                // Show ERROR message
+                messageEl.textContent = data.error;
+                messageEl.className = "modal-message error";
+                messageEl.style.display = "block";
+            }
+        })
+        .catch(error => {
+            // Show network or server error
+            messageEl.textContent = "An error occurred. Please try again.";
+            messageEl.className = "modal-message error";
+            messageEl.style.display = "block";
+        })
+        .finally(() => {
+            // Re-enable save button
+            saveButton.disabled = false;
+            saveButton.textContent = "Save Password";
+        });
+    });
+});
+</script>
+
 {% endblock %}

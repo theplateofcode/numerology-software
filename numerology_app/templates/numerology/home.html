@@ -290,24 +290,22 @@ block content %}
       });
     }
 
-    // Clear Button Logic
+    // --- MODIFIED: Clear Button Logic ---
     if (clearBtn) {
-        clearBtn.addEventListener("click", function() {
-            document.getElementById("first_name").value = '';
-            document.getElementById("middle_name").value = '';
-            document.getElementById("last_name").value = '';
-            document.getElementById("dob").value = '';
-            // If you want to clear the results too, you'd need to make a request to the server
-            // For now, this just clears the input fields.
+        clearBtn.addEventListener("click", function(event) {
+            event.preventDefault(); // Stop any default button action
+            // Navigate to the new 'clear_session' route.
+            // This will clear the session and reload the page.
+            window.location.href = "{{ url_for('numerology.clear_session') }}";
         });
     }
+    // --- End Modified Logic ---
 
     // PDF Report Button Logic
     const pdfBtn = document.getElementById("generatePdfBtn");
     if (pdfBtn) {
-      pdfBtn.addEventListener("click", function (event) { // Added event parameter
-        event.preventDefault(); // Prevent default button action
-        // Open the generated PDF in a new tab
+      pdfBtn.addEventListener("click", function (event) { 
+        event.preventDefault(); 
         window.open("{{ url_for('numerology.numerology_report_pdf') }}", "_blank");
       });
     }

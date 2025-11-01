@@ -5,6 +5,11 @@
 {% set bg = "#FFFFFF" %}
 {% set subtle = "#FDFBFF" %}
 
+{# NEW: Define Red Color Scheme #}
+{% set headerColor = "#C62828" %}
+{% set headerAccentLight = "#FADBD8" %}
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,10 +31,11 @@
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
       margin: 0; padding: 0;
+      font-weight: 500; /* MODIFIED: Bolder base font */
     }
     h1, h2, h3, h4 {
       font-family: 'Playfair Display', serif;
-      color: {{ accent }};
+      color: {{ headerColor }}; /* MODIFIED: Red heading */
       margin: 0 0 0.75em;
       font-weight: 700;
     }
@@ -44,35 +50,36 @@
     h4 { font-size: 1.1rem; margin-bottom: 0.6em; font-weight: 700; }
     p { margin: 0 0 1em; }
     .muted { color: #777; }
-    .small { font-size: 0.85rem; }
+    .small { font-size: 0.85rem; font-weight: 400; } /* Lighter weight for small text */
     .center { text-align: center; }
-    strong { font-weight: 700; }
+    strong { font-weight: 700; } /* Keep strong text bold */
     .page-break { page-break-before: always; }
 
     /* === NEW, FIXED COVER PAGE === */
     .cover-page {
-      display: block; /* No flex */
+      display: block; /* Switched to block layout */
       text-align: center;
       height: calc(297mm - 30mm); /* Full usable page height */
       page-break-after: always;
       background: {{ subtle }};
-      padding: 20mm 20mm 15mm 20mm;
+      padding: 20mm;
+      border: 2px solid #9f88a1; /* MODIFIED: Dotted border */
       position: relative; /* For absolute footer */
     }
     .cover-header {
       padding-top: 20mm; /* Space from top */
     }
     .cover-logo {
-      max-width: 100px;
+      max-width: 200px; /* MODIFIED: 100% bigger */
       height: auto;
       border-radius: 50%;
-      border: 3px solid {{ accentLight }};
+      border: 3px solid {{ headerAccentLight }}; /* MODIFIED: Light red border */
       margin-bottom: 1.5rem;
     }
     .cover-brand {
       font-family: 'Playfair Display', serif;
       font-size: 2.8rem;
-      color: {{ accent }};
+      color: {{ headerColor }}; /* MODIFIED: Red heading */
       margin-bottom: 0.5rem;
       font-weight: 700;
     }
@@ -81,13 +88,13 @@
       font-size: 1.3rem;
       color: {{ text }};
       margin-bottom: 40mm; /* Pushes client box down */
-      font-weight: 400;
+      font-weight: 500; /* MODIFIED: Bolder */
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     /* "Prepared For" box */
     .client-details-box {
-      border: 1px solid {{ border }};
+      border: 1px dotted {{ border }};
       border-radius: 8px;
       padding: 1.5rem 2rem;
       text-align: center;
@@ -101,7 +108,7 @@
       font-family: 'Roboto', sans-serif;
       font-weight: 700;
       font-size: 1rem;
-      color: {{ accent }};
+      color: {{ headerColor }}; /* MODIFIED: Red heading */
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 1rem;
@@ -118,6 +125,7 @@
     .client-details-dob {
       font-size: 1.1rem;
       color: #555;
+      margin-top: 1rem;
     }
     .cover-footer {
       position: absolute; /* Anchors to bottom of page */
@@ -126,6 +134,7 @@
       right: 15mm;
       font-size: 0.8rem;
       color: #999;
+      font-weight: 400;
     }
 
     /* === DATA PAGES (Page 2+) === */
@@ -143,44 +152,44 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
 
     /* Life Path Grid Styles */
-    .kv-long-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; color: {{ accent }}; font-weight: 700; margin-top: 0; margin-bottom: 0.3rem; }
-    .kv-long-value { margin: 0 0 1.2rem 0; }
+    .kv-long-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; color: {{ headerColor }}; font-weight: 700; margin-top: 0; margin-bottom: 0.3rem; }
+    .kv-long-value { margin: 0 0 1.2rem 0; font-weight: 500; }
     .kv-grid { display: grid; gap: 1rem; }
     .kv-grid-2 { grid-template-columns: 1fr 1fr; }
     .kv-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
     .kv-item { background: {{ subtle }}; padding: 10px 12px; border-radius: 6px; border: 1px solid {{ border }}; }
-    .kv-item .k { display: block; font-size: 0.9rem; color: {{ accent }}; font-weight: 700; margin-bottom: 4px; }
+    .kv-item .k { display: block; font-size: 0.9rem; color: {{ headerColor }}; font-weight: 700; margin-bottom: 4px; }
     .kv-item .v { display: block; font-size: 1rem; color: {{ text }}; font-weight: 500; }
     
     /* Table Styling */
-    table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+    table { width: 100%; border-collapse: collapse; font-size: 1rem; font-weight: 500; }
     th, td { border: 1px solid {{ border }}; padding: 0.6rem 0.8rem; vertical-align: top; text-align: left; }
-    th { background: {{ accentLight }}; font-weight: 700; color: #333; }
+    th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; } /* MODIFIED */
     tr:nth-child(even) td { background: {{ subtle }}; }
 
     /* Karmic Grid */
     .karmic td { text-align: center; font-weight: 700; font-size: 1.3rem; background: {{ subtle }}; height: 55px; }
 
     /* Karmic Lines */
-    .line-box { border-left: 4px solid {{ accentLight }}; padding-left: 10px; margin: 0.5rem 0 1rem; }
+    .line-box { border-left: 4px solid {{ headerAccentLight }}; padding-left: 10px; margin: 0.5rem 0 1rem; } /* MODIFIED */
     .line-box.negative { border-left-color: #E57373; }
     h4.line-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
     h4.positive { color: #1B5E20; }
     h4.negative { color: #C62828; }
-    .legend { font-size: 0.85rem; color: #555; background: {{ subtle }}; padding: 8px 12px; border-radius: 6px; border: 1px solid {{ border }}; margin-bottom: 1rem; }
+    .legend { font-size: 0.85rem; color: #555; background: {{ subtle }}; padding: 8px 12px; border-radius: 6px; border: 1px solid {{ border }}; margin-bottom: 1rem; font-weight: 400; }
     .legend .line-box, .legend .line-box.negative { display: inline-block; width: 20px; height: 10px; margin-right: 5px; padding: 0; border-left-width: 10px; vertical-align: middle; }
     
-    .footer { font-size: 0.85rem; color: #999; text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid {{ border }}; }
+    .footer { font-size: 0.85rem; color: #999; text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid {{ border }}; font-weight: 400; }
     
-    .missing-data-box { background: {{ subtle }}; border: 1px dashed #E57373; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
-    .missing-data-box p { color: #666; margin: 0; font-size: 10pt; }
+    .missing-data-box { background: {{ headerAccentLight }}; border: 1px dashed {{ headerColor }}; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
+    .missing-data-box p { color: #666; margin: 0; font-size: 10pt; font-weight: 500; }
   </style>
 </head>
 <body>
 
   <div class="cover-page">
     <div class="cover-header">
-      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="cover-logo" onerror="this.src='https://placehold.co/100x100/E7E1F7/A18CD1?text=Logo&font=roboto'">
+      <img src="{{ url_for('static', filename='img/logo_white.png') }}" alt="Logo" class="cover-logo" onerror="this.src='https://placehold.co/200x200/FADBD8/C62828?text=Logo&font=roboto'">
       <div class="cover-brand">Numerology by Neha</div>
       <div class="cover-report-title">Personal Numerology Report</div>
     </div>
@@ -198,7 +207,7 @@
     {% endif %}
 
     <div class="cover-footer">
-      Generated on {{ generated_at.strftime("%d %B %Y") if generated_at else "" }} <br>
+      Generated on {{ generated_at.strftime("%d %B %Y") if generated_at else "" }}
     </div>
   </div>
 
@@ -232,13 +241,14 @@
             <div class="kv-item"><span class="k">Mitraank (Friends)</span><span class="v">{{ life_path.mitraank or "—" }}</span></div>
             <div class="kv-item"><span class="k">Samaank (Neutral)</span><span class="v">{{ life_path.samaank or "—" }}</span></div>
             <div class="kv-item"><span class="k">Shatruaank (Enemies)</span><span class="v">{{ life_path.satraank or "—" }}</span></div>
-            <div class="kv-item"><span class="k">Unlucky Colour</span><span class="v">{{ life_path.unlucky_color or "—" }}</span></div>
           </div>
 
           <h3>Other Details</h3>
           <div class="kv-grid kv-grid-2">
             <div class="kv-item"><span class="k">Good Business</span><span class="v">{{ life_path.lucky_business or "—" }}</span></div>
             <div class="kv-item"><span class="k">Potential Illness</span><span class="v">{{ life_path.illness or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Unlucky Colour</span><span class="v">{{ life_path.unlucky_color or "—" }}</span></div>
+
           </div>
           
         {% else %}
@@ -360,7 +370,7 @@
             </div>
             {% endfor %}
             {% else %}
-            <div class="missing-data-box" style="padding: 10px; margin-top: 1rem;">
+            <div classs="missing-data-box" style="padding: 10px; margin-top: 1rem;">
                 <p class="small" style="margin:0;">No negative lines found.</p>
             </div>
             {% endif %}

@@ -10,7 +10,7 @@
 {% set subtle = "#FAF9FD" %}
 
 <header class="page-header">
-  <h1 class="page-title">Matchmaking</h1> {# Changed title text #}
+  <h1 class="page-title">Matchmaking</h1>
   <a href="/home" class="home-link">← Back to Home</a>
 </header>
 <div class="matchmaking-container">
@@ -44,7 +44,7 @@
 
       <div class="actions">
         <button type="submit" class="btn-accent">Generate</button>
-        <button type="reset" class="btn-clear">Clear</button>
+        <button type="button" class="btn-clear" id="clearMatchForm">Clear</button>
       </div>
     </div>
 
@@ -133,13 +133,13 @@
 </div>
 
 <style>
-  /* NEW: Header Styles */
+  /* Header Styles */
   .page-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1.5rem 1rem 1.5rem; /* Added padding */
-    margin: 1rem 1.5rem 0 1.5rem; /* Added margin */
+    padding: 0 1.5rem 1rem 1.5rem;
+    margin: 1rem 1.5rem 0 1.5rem;
     border-bottom: 1px solid {{ border }};
   }
   .page-title {
@@ -151,17 +151,17 @@
     font-size: 0.9rem;
     font-weight: 500;
     color: {{ accent }};
-    text-decoration: none; /* Ensure no underline */
+    text-decoration: none;
   }
   .home-link:hover {
-    color: var(--color-hover, #917BC5); /* Use theme variable if available */
+    color: var(--color-hover, #917BC5);
   }
 
   body {
     background: {{ subtle }};
     color: {{ text }};
     font-family: 'Roboto', sans-serif;
-    margin: 0; /* Ensure no default body margin */
+    margin: 0;
   }
 
   .matchmaking-container {
@@ -171,10 +171,9 @@
     padding: 20px;
     box-shadow: 0 0 10px rgba(161,140,209,0.15);
     max-width: 950px;
-    margin: 20px auto; /* Centered with margin */
+    margin: 20px auto;
   }
 
-  /* ... (rest of your existing styles remain unchanged) ... */
   .input-section {
     display: flex;
     gap: 20px;
@@ -233,9 +232,9 @@
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease; /* Added transition */
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
-  .btn-accent:hover { background: var(--color-hover, #917BC5); } /* Changed hover effect */
+  .btn-accent:hover { background: var(--color-hover, #917BC5); }
 
   .btn-clear {
     background: {{ subtle }};
@@ -244,9 +243,9 @@
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s ease, color 0.2s ease; /* Added transition */
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
-   .btn-clear:hover { background: #e0e0e0; } /* Added hover */
+   .btn-clear:hover { background: #e0e0e0; }
 
   .result-section {
     margin-top: 25px;
@@ -318,4 +317,26 @@
     margin-top: 15px;
   }
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const clearButton = document.getElementById("clearMatchForm");
+  
+  if (clearButton) {
+    clearButton.addEventListener("click", function (event) {
+      event.preventDefault(); // Stop it from submitting
+      
+      // Clear all the input fields
+      document.getElementById("p1_name").value = "";
+      document.getElementById("p1_dob").value = "";
+      document.getElementById("p2_name").value = "";
+      document.getElementById("p2_dob").value = "";
+      
+      // Optional: If you want to clear the results too, reload the page
+      // window.location.href = "{{ url_for('matchmaking.matchmaking_home') }}";
+    });
+  }
+});
+</script>
+
 {% endblock %}

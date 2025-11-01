@@ -7,15 +7,22 @@ from numerology_app.models import (
     AlphabetDetails,
     RepeatingNumber,
     MissingNumber,
-    
     LuckyDayMeaning,
     LuckyYearMonthMeaning
-
 )
+from datetime import datetime
+import re # Added import
 
 numerology_details_bp = Blueprint(
     "numerology_details", __name__, url_prefix="/numerology/details"
 )
+
+@numerology_details_bp.before_request
+def require_login():
+    """Gatekeeper for all routes in this blueprint."""
+    if "user" not in session:
+        flash("You must be logged in to view this page.", "error")
+        return redirect(url_for("auth.login"))
 
 # ----------------------------------------------
 # Utility function: get stored session results
@@ -81,13 +88,10 @@ def repeating_detail():
     if not results:
         return render_template("numerology/details/repeating.html", repeated_data=None)
 
-    # Get the dict of {number: count}, e.g., {1: 1, 0: 2, 7: 1}
     repeating_dict = results.get("missing_repeat", {}).get("repeating", {})
     if not repeating_dict:
         return render_template("numerology/details/repeating.html", repeated_data=None)
 
-    # MODIFIED: This will hold the data in a more structured way
-    # e.g., {1: {'count': 1, 'meanings': [obj]}, 0: {'count': 2, 'meanings': [obj, obj]}}
     template_data = {}
 
     for number, count in repeating_dict.items():
@@ -97,14 +101,12 @@ def repeating_detail():
         except ValueError:
             continue 
 
-        # Query for all meanings UP TO the counted number of repetitions
         meanings = RepeatingNumber.query.filter(
             RepeatingNumber.number == num_int,
             RepeatingNumber.repetitions <= rep_count
         ).order_by(RepeatingNumber.repetitions).all()
         
         if meanings:
-            # MODIFIED: Store both the real count and the list of meanings
             template_data[num_int] = {
                 'count': rep_count,
                 'meanings': meanings
@@ -133,11 +135,6 @@ def missing_detail():
 
     return render_template("numerology/details/missing.html", missing_numbers=missing_numbers)
 
-
-import re # <-- Add this import at the top of your file
-
-# ... (other imports)
-
 # ----------------------------------------------
 # KARMIC CHART DETAILS (Positive & Negative Lines)
 # ----------------------------------------------
@@ -151,72 +148,35 @@ def karmic_lines_detail():
         return redirect(url_for('numerology.numerology_home'))
 
     karmic_chart_data = results.get('karmic_chart', {})
-
-    # --- THIS IS THE MODIFIED SECTION ---
-    # Get the original lists (e.g., ['Physical Line (1-4-7)'])
     calculated_pos_full_names = karmic_chart_data.get('positive_lines', [])
     calculated_neg_full_names = karmic_chart_data.get('negative_lines', [])
 
-    # Function to extract 'X-Y-Z' from '(X-Y-Z)' using regex
     def extract_numbers(line_name_str):
         match = re.search(r'\((\d+-\d+-\d+)\)', line_name_str)
         return match.group(1) if match else None
 
-    # Extract only the number strings (e.g., ['1-4-7'])
     pos_number_keys = [extract_numbers(name) for name in calculated_pos_full_names if extract_numbers(name)]
     neg_number_keys = [extract_numbers(name) for name in calculated_neg_full_names if extract_numbers(name)]
-    # --- END MODIFIED SECTION ---
 
-
-    # Now query using the extracted number keys
     positive_lines = KarmicLineMeaning.query.filter(
-        KarmicLineMeaning.numbers.in_(pos_number_keys), # <-- Use extracted keys
+        KarmicLineMeaning.numbers.in_(pos_number_keys),
         KarmicLineMeaning.line_type == 'positive'
     ).all()
 
     negative_lines = KarmicLineMeaning.query.filter(
-        KarmicLineMeaning.numbers.in_(neg_number_keys), # <-- Use extracted keys
+        KarmicLineMeaning.numbers.in_(neg_number_keys),
         KarmicLineMeaning.line_type == 'negative'
     ).all()
-
-    # --- Debugging Prints (Optional - remove after testing) ---
-    print("--- Debugging Karmic Lines (After Fix) ---")
-    print(f"Extracted Positive Number Keys: {pos_number_keys}")
-    print(f"Extracted Negative Number Keys: {neg_number_keys}")
-    print(f"Found Positive Lines from DB: {positive_lines}")
-    print(f"Found Negative Lines from DB: {negative_lines}")
-    print("-----------------------------------------")
-    # ----------------------------------------------------
 
     return render_template(
         "numerology/details/karmic_lines_detail.html",
         positive_lines=positive_lines,
         negative_lines=negative_lines,
     )
-# @numerology_details_bp.route("/details/karmic-chart")
-# def karmic_chart_detail():
-#     from numerology_app.models import KarmicChartDetails, RepeatingNumber, MissingNumber
 
-#     # Get all karmic chart number meanings (1–9)
-#     chart_data = KarmicChartDetails.query.order_by(KarmicChartDetails.number).all()
-#     repeating_data = RepeatingNumber.query.all()
-#     missing_data = MissingNumber.query.all()
-
-#     return render_template(
-#         "numerology/details/karmic_chart_detail.html",
-#         chart_data=chart_data,
-#         repeating_data=repeating_data,
-#         missing_data=missing_data,
-#     )
-
-
-
-from datetime import datetime
-# add missing imports
-
-
-# ... (your other routes)
-
+# ----------------------------------------------
+# FUTURE PREDICTIONS
+# ----------------------------------------------
 @numerology_details_bp.route("/future-predictions")
 def future_prediction_detail():
     """
