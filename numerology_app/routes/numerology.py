@@ -5,7 +5,7 @@ from flask import (
     redirect, url_for, Response, current_app, flash
 )
 from numerology_app.utils import numerology
-from numerology_app import db
+from numerology_app.extensions import db
 from numerology_app.models import (
     LifePath, LifeExpression, SoulUrge, BirthdayDetails, AlphabetDetails,
     RepeatingNumber, MissingNumber, KarmicLineMeaning, Client,

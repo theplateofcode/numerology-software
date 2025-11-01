@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
-from numerology_app import db
+from numerology_app.extensions import db
 from numerology_app.models import (
     LifePath, LifeExpression, SoulUrge,
     BirthdayDetails, AlphabetDetails,

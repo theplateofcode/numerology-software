@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from numerology_app.models import Client
-from numerology_app import db 
+from numerology_app.extensions import db 
 
 clients_bp = Blueprint("clients", __name__, url_prefix="/clients")
 

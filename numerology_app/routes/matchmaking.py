@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, flash, session, redirect, url_for
 from numerology_app.utils import numerology
 from numerology_app.models import MissingNumber, LifePath
-from numerology_app import db
+from numerology_app.extensions import db
 
 matchmaking_bp = Blueprint("matchmaking", __name__, url_prefix="/matchmaking")
 

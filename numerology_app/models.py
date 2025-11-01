@@ -1,4 +1,4 @@
-from numerology_app import db
+from numerology_app.extensions import db
 
 
 # -------------- Common Base ---------------- #
