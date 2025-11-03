@@ -64,6 +64,12 @@
       page-break-after: avoid; 
     }
     h3 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-top: 1px solid {{ border }}; padding-top: 1rem;}
+    /* Remove top border for the first h3 in a card */
+    .card h3:first-of-type {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+    }
     h4 { font-size: 1.1rem; margin-bottom: 0.6em; font-weight: 700; }
     p { margin: 0 0 1em; }
     .muted { color: #777; }
@@ -161,13 +167,10 @@
       border-radius: 10px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 1rem;
-      /* FIX: Removed 'page-break-inside: avoid' from the main class */
     }
-    /* FIX: Re-applied the rule to all cards EXCEPT .allow-page-break */
     .card:not(.allow-page-break) {
       page-break-inside: avoid;
     }
-    /* FIX: This class allows the card to split across pages */
     .allow-page-break {
       page-break-inside: auto !important;
     }
@@ -191,10 +194,9 @@
     th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; }
     tr:nth-child(even) td { background: {{ subtle }}; }
     
-    /* FIX: Set narrow widths for table columns */
-    .repeating-table th:nth-child(1), /* Number */
-    .repeating-table th:nth-child(2), /* Count */
-    .missing-table th:nth-child(1) { /* Number */
+    .repeating-table th:nth-child(1), 
+    .repeating-table th:nth-child(2), 
+    .missing-table th:nth-child(1) { 
       width: 20%;
     }
     .repeating-table td:nth-child(1),
@@ -415,44 +417,45 @@
 
     <section class="section page-break">
       <div class="card allow-page-break"> 
-          <div class="grid-2">
-              <div>
-                  <h3>Repeating Numbers</h3>
-                  {% if repeating_rows %}
-                  <table class="repeating-table"> <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
-                    <tbody>
-                      {% for r in repeating_rows %}
-                      <tr>
-                        <td classD="center"><strong>{{ r.number }}</strong></td>
-                        <td class="center">{{ r.value }}</td>
-                        <td>{{ r.meaning or "—" }}</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                  {% else %}
-                  <p class="muted center">No significantly repeating numbers found.</p>
-                  {% endif %}
-              </div>
-
-              <div>
-                  <h3>Missing Numbers</h3>
-                  {% if missing_rows %}
-                  <table class="missing-table"> <thead><tr><th>Number</th><th>Description</th></tr></thead>
-                    <tbody>
-                      {% for m in missing_rows %}
-                      <tr>
-                        <td class="center"><strong>{{ m.number }}</strong></td>
-                        <td>{{ m.details or "—" }}</td>
-                      </tr>
-                      {% endfor %}
-                    </tbody>
-                  </table>
-                  {% else %}
-                  <p class="muted center">No missing numbers found.</p>
-                  {% endif %}
-              </div>
+          <h2>Repeating &amp; Missing Numbers</h2>
+          
+          <div>
+              <h3>Repeating Numbers</h3>
+              {% if repeating_rows %}
+              <table class="repeating-table"> <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  {% for r in repeating_rows %}
+                  <tr>
+                    <td class="center"><strong>{{ r.number }}</strong></td>
+                    <td class="center">{{ r.value }}</td>
+                    <td>{{ r.meaning or "—" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+              <p class="muted center">No significantly repeating numbers found.</p>
+              {% endif %}
           </div>
+
+          <div>
+              <h3>Missing Numbers</h3>
+              {% if missing_rows %}
+              <table class="missing-table"> <thead><tr><th>Number</th><th>Description</th></tr></thead>
+                <tbody>
+                  {% for m in missing_rows %}
+                  <tr>
+                    <td class="center"><strong>{{ m.number }}</strong></td>
+                    <td>{{ m.details or "—" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+              {% else %}
+              <p class="muted center">No missing numbers found.</p>
+              {% endif %}
+          </div>
+          
         </div>
     </section>
 
