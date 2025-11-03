@@ -161,8 +161,17 @@
       border-radius: 10px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 1rem;
-      page-break-inside: avoid; /* Keep card content together */
+      /* FIX: Removed 'page-break-inside: avoid' from the main class */
     }
+    /* FIX: Re-applied the rule to all cards EXCEPT .allow-page-break */
+    .card:not(.allow-page-break) {
+      page-break-inside: avoid;
+    }
+    /* FIX: This class allows the card to split across pages */
+    .allow-page-break {
+      page-break-inside: auto !important;
+    }
+    
     .card h2 { margin-top: 0.2em; margin-bottom: 1em; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
 
@@ -182,7 +191,7 @@
     th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; }
     tr:nth-child(even) td { background: {{ subtle }}; }
     
-    /* Set narrow widths for table columns */
+    /* FIX: Set narrow widths for table columns */
     .repeating-table th:nth-child(1), /* Number */
     .repeating-table th:nth-child(2), /* Count */
     .missing-table th:nth-child(1) { /* Number */
@@ -405,8 +414,8 @@
     </section>
 
     <section class="section page-break">
-      <div class="card"> 
-          <!-- <h2>Repeating &amp; Missing Numbers</h2> -->
+      <div class="card allow-page-break"> 
+          <h2>Repeating &amp; Missing Numbers</h2>
           <div class="grid-2">
               <div>
                   <h3>Repeating Numbers</h3>
@@ -415,7 +424,7 @@
                     <tbody>
                       {% for r in repeating_rows %}
                       <tr>
-                        <td class="center"><strong>{{ r.number }}</strong></td>
+                        <td classD="center"><strong>{{ r.number }}</strong></td>
                         <td class="center">{{ r.value }}</td>
                         <td>{{ r.meaning or "—" }}</td>
                       </tr>
