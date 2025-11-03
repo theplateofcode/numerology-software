@@ -51,11 +51,11 @@
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
       margin: 0; padding: 0;
-      font-weight: 500; /* MODIFIED: Bolder base font */
+      font-weight: 500; /* Bolder base font */
     }
     h1, h2, h3, h4 {
       font-family: 'Playfair Display', serif;
-      color: {{ headerColor }}; /* MODIFIED: Red heading */
+      color: {{ headerColor }}; /* Red heading */
       margin: 0 0 0.75em;
       font-weight: 700;
     }
@@ -65,15 +65,15 @@
       border-bottom: 2px solid {{ border }};
       padding-bottom: 0.4em;
       margin-bottom: 1em;
-      page-break-after: avoid; /* === NEW FIX: Prevents headings from being orphaned === */
+      page-break-after: avoid; /* Prevents headings from being orphaned */
     }
     h3 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-top: 1px solid {{ border }}; padding-top: 1rem;}
     h4 { font-size: 1.1rem; margin-bottom: 0.6em; font-weight: 700; }
     p { margin: 0 0 1em; }
     .muted { color: #777; }
-    .small { font-size: 0.85rem; font-weight: 400; } /* Lighter weight for small text */
+    .small { font-size: 0.85rem; font-weight: 400; }
     .center { text-align: center; }
-    strong { font-weight: 700; } /* Keep strong text bold */
+    strong { font-weight: 700; }
     .page-break { page-break-before: always; }
 
     /* === NEW, FIXED COVER PAGE === */
@@ -84,23 +84,23 @@
       page-break-after: always;
       background: {{ subtle }};
       padding: 20mm;
-      border: 2px solid #9f88a1; /* MODIFIED: Dotted border */
+      border: 2px dotted {{ headerColor }}; /* Dotted border */
       position: relative; /* For absolute footer */
     }
     .cover-header {
       padding-top: 20mm; /* Space from top */
     }
     .cover-logo {
-      max-width: 200px; /* MODIFIED: 100% bigger */
+      max-width: 200px; /* Bigger logo */
       height: auto;
       border-radius: 50%;
-      border: 3px solid {{ headerAccentLight }}; /* MODIFIED: Light red border */
+      border: 3px solid {{ headerAccentLight }}; /* Light red border */
       margin-bottom: 1.5rem;
     }
     .cover-brand {
       font-family: 'Playfair Display', serif;
       font-size: 2.8rem;
-      color: {{ headerColor }}; /* MODIFIED: Red heading */
+      color: {{ headerColor }}; /* Red heading */
       margin-bottom: 0.5rem;
       font-weight: 700;
     }
@@ -109,13 +109,13 @@
       font-size: 1.3rem;
       color: {{ text }};
       margin-bottom: 40mm; /* Pushes client box down */
-      font-weight: 500; /* MODIFIED: Bolder */
+      font-weight: 500; /* Bolder */
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     /* "Prepared For" box */
     .client-details-box {
-      border: 1px dotted {{ border }};
+      border: 1px solid {{ border }};
       border-radius: 8px;
       padding: 1.5rem 2rem;
       text-align: center;
@@ -129,7 +129,7 @@
       font-family: 'Roboto', sans-serif;
       font-weight: 700;
       font-size: 1rem;
-      color: {{ headerColor }}; /* MODIFIED: Red heading */
+      color: {{ headerColor }}; /* Red heading */
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 1rem;
@@ -146,7 +146,6 @@
     .client-details-dob {
       font-size: 1.1rem;
       color: #555;
-      margin-top: 1rem;
     }
     .cover-footer {
       position: absolute; /* Anchors to bottom of page */
@@ -167,7 +166,7 @@
       border-radius: 10px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 1rem;
-      page-break-inside: avoid;
+      page-break-inside: avoid; /* Prevent card from splitting by default */
     }
     .card h2 { margin-top: 0.2em; margin-bottom: 1em; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
@@ -185,14 +184,14 @@
     /* Table Styling */
     table { width: 100%; border-collapse: collapse; font-size: 1rem; font-weight: 500; }
     th, td { border: 1px solid {{ border }}; padding: 0.6rem 0.8rem; vertical-align: top; text-align: left; }
-    th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; } /* MODIFIED */
+    th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; }
     tr:nth-child(even) td { background: {{ subtle }}; }
 
     /* Karmic Grid */
     .karmic td { text-align: center; font-weight: 700; font-size: 1.3rem; background: {{ subtle }}; height: 55px; }
 
     /* Karmic Lines */
-    .line-box { border-left: 4px solid {{ headerAccentLight }}; padding-left: 10px; margin: 0.5rem 0 1rem; } /* MODIFIED */
+    .line-box { border-left: 4px solid {{ headerAccentLight }}; padding-left: 10px; margin: 0.5rem 0 1rem; }
     .line-box.negative { border-left-color: #E57373; }
     h4.line-title { font-family: 'Roboto', sans-serif; font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
     h4.positive { color: #1B5E20; }
@@ -203,18 +202,26 @@
     .missing-data-box { background: {{ headerAccentLight }}; border: 1px dashed {{ headerColor }}; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
     .missing-data-box p { color: #666; margin: 0; font-size: 10pt; font-weight: 500; }
     
-    /* === FIX 1: Allow page break on repeating/missing numbers card === */
-    .allow-break .card {
+    /* --- FIX: Allow this specific card to break --- */
+    .allow-break.card {
       page-break-inside: auto;
     }
     
+    /* --- FIX: Set narrow widths for table columns --- */
+    .repeating-table th:nth-child(1), /* Number */
+    .repeating-table th:nth-child(2) { /* Count */
+      width: 20%;
+    }
+    .missing-table th:nth-child(1) { /* Number */
+      width: 20%;
+    }
   </style>
 </head>
 <body>
 
   <div class="cover-page">
     <div class="cover-header">
-      <img src="{{ url_for('static', filename='img/logo_white.png') }}" alt="Logo" class="cover-logo" onerror="this.src='https://placehold.co/200x200/FADBD8/C62828?text=Logo&font=roboto'">
+      <img src="{{ url_for('static', filename='img/logo.jpg') }}" alt="Logo" class="cover-logo" onerror="this.src='https://placehold.co/200x200/FADBD8/C62828?text=Logo&font=roboto'">
       <div class="cover-brand">Numerology by Neha</div>
       <div class="cover-report-title">Personal Numerology Report</div>
     </div>
@@ -256,7 +263,7 @@
             <div class="kv-item"><span class="k">Lucky Days</span><span class="v">{{ life_path.lucky_days or "—" }}</span></div>
             <div class="kv-item"><span class="k">Lucky Years</span><span class="v">{{ life_path.lucky_years or "—" }}</span></div>
             <div class="kv-item"><span class="k">Lucky Direction</span><span class="v">{{ life_path.lucky_direction or "—" }}</span></div>
-            <div class="kv-item"><span classs="k">Lucky Colour</span><span class="v">{{ life_path.lucky_color or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Lucky Colour</span><span class="v">{{ life_path.lucky_color or "—" }}</span></div>
             <div class="kv-item"><span class="k">Lucky Stone</span><span class="v">{{ life_path.stone or "—" }}</span></div>
           </div>
           
@@ -266,14 +273,13 @@
             <div class="kv-item"><span class="k">Mitraank (Friends)</span><span class="v">{{ life_path.mitraank or "—" }}</span></div>
             <div class="kv-item"><span class="k">Samaank (Neutral)</span><span class="v">{{ life_path.samaank or "—" }}</span></div>
             <div class="kv-item"><span class="k">Shatruaank (Enemies)</span><span class="v">{{ life_path.satraank or "—" }}</span></div>
+            <div class="kv-item"><span class="k">Unlucky Colour</span><span class="v">{{ life_path.unlucky_color or "—" }}</span></div>
           </div>
 
           <h3>Other Details</h3>
           <div class="kv-grid kv-grid-2">
             <div class="kv-item"><span class="k">Good Business</span><span class="v">{{ life_path.lucky_business or "—" }}</span></div>
             <div class="kv-item"><span class="k">Potential Illness</span><span class="v">{{ life_path.illness or "—" }}</span></div>
-            <div class="kv-item"><span class="k">Unlucky Colour</span><span class="v">{{ life_path.unlucky_color or "—" }}</span></div>
-
           </div>
           
         {% else %}
@@ -395,7 +401,7 @@
             </div>
             {% endfor %}
             {% else %}
-            <div classs="missing-data-box" style="padding: 10px; margin-top: 1rem;">
+            <div class="missing-data-box" style="padding: 10px; margin-top: 1rem;">
                 <p class="small" style="margin:0;">No negative lines found.</p>
             </div>
             {% endif %}
@@ -404,15 +410,14 @@
       </div>
     </section>
 
-    <!-- === FIX 1: Added 'allow-break' class to this section === -->
-    <section class="section page-break allow-break">
-      <div class="card">
+    <section class="section page-break">
+      <div class="card allow-break">
           <h2>Repeating &amp; Missing Numbers</h2>
           <div class="grid-2">
               <div>
                   <h3>Repeating Numbers</h3>
                   {% if repeating_rows %}
-                  <table>
+                  <table class="repeating-table">
                     <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
                     <tbody>
                       {% for r in repeating_rows %}
@@ -432,7 +437,7 @@
               <div>
                   <h3>Missing Numbers</h3>
                   {% if missing_rows %}
-                  <table>
+                  <table class="missing-table">
                     <thead><tr><th>Number</th><th>Description</th></tr></thead>
                     <tbody>
                       {% for m in missing_rows %}
@@ -451,5 +456,5 @@
         </div>
     </section>
 
-  </div></body>
+    </div></body>
 </html>
