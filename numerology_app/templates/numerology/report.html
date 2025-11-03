@@ -22,9 +22,7 @@
     /* === PAGE SETUP & BASE STYLES === */
     @page {
       size: A4;
-      margin: 15mm; /* This 15mm bottom margin leaves space for the footer */
-
-      /* This adds the footer to the bottom-center of EVERY page */
+      margin: 15mm;
       @bottom-center {
         content: "Analysis by Numerology by Neha";
         font-family: 'Roboto', sans-serif;
@@ -33,8 +31,6 @@
         font-weight: 400;
       }
     }
-
-    /* This targets the cover page (the :first page) and hides the footer */
     @page :first {
       @bottom-center {
         content: ""; /* Sets the footer content to be blank */
@@ -76,31 +72,31 @@
     strong { font-weight: 700; }
     .page-break { page-break-before: always; }
 
-    /* === NEW, FIXED COVER PAGE === */
+    /* === COVER PAGE (FIXED) === */
     .cover-page {
-      display: block; /* Switched to block layout */
+      display: block;
       text-align: center;
-      height: calc(297mm - 30mm); /* Full usable page height */
+      height: calc(297mm - 30mm); 
       page-break-after: always;
       background: {{ subtle }};
       padding: 20mm;
-      border: 2px dotted {{ headerColor }}; /* Dotted border */
-      position: relative; /* For absolute footer */
+      border: 2px dotted {{ headerColor }};
+      position: relative;
     }
     .cover-header {
-      padding-top: 20mm; /* Space from top */
+      padding-top: 20mm; 
     }
     .cover-logo {
-      max-width: 200px; /* Bigger logo */
+      max-width: 200px;
       height: auto;
       border-radius: 50%;
-      border: 3px solid {{ headerAccentLight }}; /* Light red border */
+      border: 3px solid {{ headerAccentLight }};
       margin-bottom: 1.5rem;
     }
     .cover-brand {
       font-family: 'Playfair Display', serif;
       font-size: 2.8rem;
-      color: {{ headerColor }}; /* Red heading */
+      color: {{ headerColor }};
       margin-bottom: 0.5rem;
       font-weight: 700;
     }
@@ -108,28 +104,27 @@
       font-family: 'Roboto', sans-serif;
       font-size: 1.3rem;
       color: {{ text }};
-      margin-bottom: 40mm; /* Pushes client box down */
-      font-weight: 500; /* Bolder */
+      margin-bottom: 40mm; 
+      font-weight: 500; 
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    /* "Prepared For" box */
     .client-details-box {
       border: 1px solid {{ border }};
       border-radius: 8px;
       padding: 1.5rem 2rem;
       text-align: center;
-      background: {{ bg }}; /* White background */
+      background: {{ bg }};
       width: 100%;
       max-width: 450px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      margin: 0 auto; /* Center the box */
+      margin: 0 auto;
     }
     .client-details-label {
       font-family: 'Roboto', sans-serif;
       font-weight: 700;
       font-size: 1rem;
-      color: {{ headerColor }}; /* Red heading */
+      color: {{ headerColor }};
       text-transform: uppercase;
       letter-spacing: 1px;
       margin-bottom: 1rem;
@@ -148,7 +143,7 @@
       color: #555;
     }
     .cover-footer {
-      position: absolute; /* Anchors to bottom of page */
+      position: absolute; 
       bottom: 15mm;
       left: 15mm;
       right: 15mm;
@@ -166,7 +161,8 @@
       border-radius: 10px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 1rem;
-      page-break-inside: avoid; /* Prevent card from splitting by default */
+      /* FIX: This line is removed to allow content to flow across pages */
+      /* page-break-inside: avoid; */ 
     }
     .card h2 { margin-top: 0.2em; margin-bottom: 1em; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
@@ -186,6 +182,14 @@
     th, td { border: 1px solid {{ border }}; padding: 0.6rem 0.8rem; vertical-align: top; text-align: left; }
     th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; }
     tr:nth-child(even) td { background: {{ subtle }}; }
+    
+    /* FIX: Set narrow widths for table columns */
+    .repeating-table th:nth-child(1), /* Number */
+    .repeating-table th:nth-child(2), /* Count */
+    .missing-table th:nth-child(1) { /* Number */
+      width: 20%;
+      text-align: center;
+    }
 
     /* Karmic Grid */
     .karmic td { text-align: center; font-weight: 700; font-size: 1.3rem; background: {{ subtle }}; height: 55px; }
@@ -202,19 +206,6 @@
     .missing-data-box { background: {{ headerAccentLight }}; border: 1px dashed {{ headerColor }}; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
     .missing-data-box p { color: #666; margin: 0; font-size: 10pt; font-weight: 500; }
     
-    /* --- FIX: Allow this specific card to break --- */
-    .allow-break.card {
-      page-break-inside: auto;
-    }
-    
-    /* --- FIX: Set narrow widths for table columns --- */
-    .repeating-table th:nth-child(1), /* Number */
-    .repeating-table th:nth-child(2) { /* Count */
-      width: 20%;
-    }
-    .missing-table th:nth-child(1) { /* Number */
-      width: 20%;
-    }
   </style>
 </head>
 <body>
@@ -411,14 +402,13 @@
     </section>
 
     <section class="section page-break">
-      <div class="card allow-break">
+      <div class="card"> 
           <h2>Repeating &amp; Missing Numbers</h2>
           <div class="grid-2">
               <div>
                   <h3>Repeating Numbers</h3>
                   {% if repeating_rows %}
-                  <table class="repeating-table">
-                    <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
+                  <table class="repeating-table"> <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
                     <tbody>
                       {% for r in repeating_rows %}
                       <tr>
@@ -437,8 +427,7 @@
               <div>
                   <h3>Missing Numbers</h3>
                   {% if missing_rows %}
-                  <table class="missing-table">
-                    <thead><tr><th>Number</th><th>Description</th></tr></thead>
+                  <table class="missing-table"> <thead><tr><th>Number</th><th>Description</th></tr></thead>
                     <tbody>
                       {% for m in missing_rows %}
                       <tr>
