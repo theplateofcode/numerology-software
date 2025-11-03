@@ -42,15 +42,17 @@
   }
 
   /* Left-side navigation panel */
-  .side-nav {
-    flex: 0 0 300px; /* Do not grow or shrink, fixed width of 300px */
-    background-color: var(--color-surface, #ffffff);
-    border-right: 1px solid var(--color-border, #e0e0e0);
-    display: flex;
-    flex-direction: column;
-    padding: 2rem;
-    box-shadow: 3px 0 15px rgba(0,0,0,0.05);
-  }
+/* Left-side navigation panel */
+ .side-nav {
+   flex: 0 0 300px; /* Do not grow or shrink, fixed width of 300px */
+   background-color: var(--color-surface, #ffffff);
+   border-right: 1px solid var(--color-border, #e0e0e0);
+   display: flex;
+   flex-direction: column;
+   padding: 2rem;
+   box-shadow: 3px 0 15px rgba(0,0,0,0.05);
+   overflow-y: auto; /* <-- ADD THIS LINE */
+ }
 
   .nav-header h2 {
     margin-top: 0;
