@@ -61,8 +61,7 @@
       border-bottom: 2px solid {{ border }};
       padding-bottom: 0.4em;
       margin-bottom: 1em;
-      /* FIX: Removed the problematic rule */
-      /* page-break-after: avoid; */
+      page-break-after: avoid; 
     }
     h3 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; border-top: 1px solid {{ border }}; padding-top: 1rem;}
     h4 { font-size: 1.1rem; margin-bottom: 0.6em; font-weight: 700; }
@@ -162,7 +161,7 @@
       border-radius: 10px;
       padding: 1.2rem 1.5rem;
       margin-bottom: 1rem;
-      page-break-inside: avoid; /* This is the default, ensures cards stay whole */
+      page-break-inside: avoid; /* Keep card content together */
     }
     .card h2 { margin-top: 0.2em; margin-bottom: 1em; }
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; }
@@ -183,19 +182,17 @@
     th { background: {{ headerAccentLight }}; font-weight: 700; color: {{ headerColor }}; }
     tr:nth-child(even) td { background: {{ subtle }}; }
     
-    /* FIX: Set narrow widths for table columns */
+    /* Set narrow widths for table columns */
     .repeating-table th:nth-child(1), /* Number */
     .repeating-table th:nth-child(2), /* Count */
     .missing-table th:nth-child(1) { /* Number */
       width: 20%;
-      text-align: center;
     }
     .repeating-table td:nth-child(1),
     .repeating-table td:nth-child(2),
     .missing-table td:nth-child(1) {
         text-align: center;
     }
-
 
     /* Karmic Grid */
     .karmic td { text-align: center; font-weight: 700; font-size: 1.3rem; background: {{ subtle }}; height: 55px; }
@@ -211,8 +208,6 @@
     
     .missing-data-box { background: {{ headerAccentLight }}; border: 1px dashed {{ headerColor }}; border-radius: 8px; padding: 10px; text-align: center; margin-top: 10px; }
     .missing-data-box p { color: #666; margin: 0; font-size: 10pt; font-weight: 500; }
-    
-    /* FIX: Remove the allow-break class style, it's no longer needed */
     
   </style>
 </head>
@@ -410,14 +405,13 @@
     </section>
 
     <section class="section page-break">
-      <div class="card">
+      <div class="card"> 
           <h2>Repeating &amp; Missing Numbers</h2>
           <div class="grid-2">
               <div>
                   <h3>Repeating Numbers</h3>
                   {% if repeating_rows %}
-                  <table class="repeating-table">
-                    <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
+                  <table class="repeating-table"> <thead><tr><th>Number</th><th>Count</th><th>Meaning</th></tr></thead>
                     <tbody>
                       {% for r in repeating_rows %}
                       <tr>
@@ -436,8 +430,7 @@
               <div>
                   <h3>Missing Numbers</h3>
                   {% if missing_rows %}
-                  <table class="missing-table">
-                    <thead><tr><th>Number</th><th>Description</th></tr></thead>
+                  <table class="missing-table"> <thead><tr><th>Number</th><th>Description</th></tr></thead>
                     <tbody>
                       {% for m in missing_rows %}
                       <tr>
