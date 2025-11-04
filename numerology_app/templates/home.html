@@ -16,9 +16,6 @@
         <li style="color: #ff7377;"><a href="{{ url_for('auth.logout') }}">Logout</a></li>
       </ul>
     </nav>
-    <!-- <div class="nav-footer">
-        <a href="{{ url_for('auth.logout') }}">Logout</a>
-    </div> -->
   </aside>
 
   <section class="image-panel">
@@ -43,17 +40,16 @@
   }
 
   /* Left-side navigation panel */
-/* Left-side navigation panel */
- .side-nav {
-   flex: 0 0 300px; /* Do not grow or shrink, fixed width of 300px */
-   background-color: var(--color-surface, #ffffff);
-   border-right: 1px solid var(--color-border, #e0e0e0);
-   display: flex;
-   flex-direction: column;
-   padding: 2rem;
-   box-shadow: 3px 0 15px rgba(0,0,0,0.05);
-   overflow-y: auto; /* <-- ADD THIS LINE */
- }
+  .side-nav {
+    flex: 0 0 300px; /* Do not grow or shrink, fixed width of 300px */
+    background-color: var(--color-surface, #ffffff);
+    border-right: 1px solid var(--color-border, #e0e0e0);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: 3px 0 15px rgba(0,0,0,0.05);
+    overflow-y: auto; 
+  }
 
   .nav-header h2 {
     margin-top: 0;
@@ -88,23 +84,6 @@
     color: var(--color-accent, #A18CD1);
   }
 
-  /* .nav-footer a {
-      display: block;
-      text-align: center;
-      padding: 0.75rem;
-      text-decoration: none;
-      color: var(--color-text, #636363);
-      background-color: var(--color-bg, #F7F5FB);
-      border-radius: var(--radius, 8px);
-      font-weight: 500;
-      transition: background-color 0.2s ease, color 0.2s ease;
-  } */
-
-  /* .nav-footer a:hover {
-      background-color: var(--color-accent, #A18CD1);
-      color: white;
-  } */
-
   /* Right-side image panel */
   .image-panel {
     flex-grow: 1; /* Takes up the remaining width */
@@ -117,5 +96,35 @@
     height: 100%;
     object-fit: cover; /* Scales the image to cover the area without distortion */
   }
+  
+  /* --- NEW: RESPONSIVE STYLES --- */
+  
+  /* For Portrait Tablets and Phones (768px and down) */
+  @media (max-width: 768px) {
+    body, html {
+      overflow-y: auto; /* Allow the page to scroll */
+      height: auto; /* Remove fixed height */
+    }
+
+    .home-container {
+      flex-direction: column; /* Stack the sidebar on top of the image */
+      height: auto; /* Let content define the height */
+    }
+
+    .side-nav {
+      flex-basis: auto; /* Let sidebar take its own content height */
+      width: 100%; /* Make it full-width */
+      box-sizing: border-box; /* Include padding in width calculation */
+      height: auto; /* Override 100vh */
+      overflow-y: visible; /* Not needed when height is auto */
+    }
+
+    .image-panel {
+      flex-grow: 1;
+      height: 60vh; /* Give image a reasonable height */
+      min-height: 350px; /* Ensure it's not too small */
+    }
+  }
+  
 </style>
 {% endblock %}
