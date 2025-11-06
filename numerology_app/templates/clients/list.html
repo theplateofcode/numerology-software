@@ -149,6 +149,17 @@
     width: 120px;
     padding: 5px;
   }
+  /* === FIX: Ensure dropdowns appear above card boundaries === */
+.dashboard-card {
+  position: relative; /* establish stacking context */
+  overflow: visible !important; /* allow dropdown to extend beyond card */
+}
+
+.actions-dropdown {
+  z-index: 2000 !important; /* higher than modal background */
+  overflow: visible;
+}
+
   .actions-dropdown.show { display: block; }
   .action-item {
     display: block;
