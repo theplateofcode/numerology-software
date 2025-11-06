@@ -53,7 +53,7 @@ def numerology_home():
         # 2. Convert it to the YYYY-MM-DD format that the backend expects
         try:
             # This handles "19 07 2004" or "19-07-2004" or "19/07/2004"
-            parts = re.split(r'[ /.-]', dob_from_form) # Split by space, /, ., or -
+            parts = re.split(r'[ /.-+]', dob_from_form) # Split by space, /, ., or -
             if len(parts) == 3:
                 day, month, year = parts[0], parts[1], parts[2]
                 # Re-assemble in the correct YYYY-MM-DD format
