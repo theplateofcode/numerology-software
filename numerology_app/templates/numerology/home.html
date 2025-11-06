@@ -22,9 +22,7 @@ block content %}
     />
     
     <input
-      id="dob" name="dob" type="text" placeholder="DD-MM-YYYY"
-      pattern="\d{2}-\d{2}-\d{4}" 
-      title="Please enter the date in DD-MM-YYYY format"
+      id="dob" name="dob" type="date"
       value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
     />
     
@@ -192,7 +190,7 @@ block content %}
         <li class="client-item">
           {% set dob_str = client.dob if client.dob is string else client.dob.strftime('%Y-%m-%d') %}
           {% set dob_display = client.dob if client.dob is string else client.dob.strftime('%d-%b-%Y') %}
-          <a href="#" data-fname="{{ client.first_name }}" data-mname="{{ client.middle_name }}" data-lname="{{ client.last_name }}" data-dob="{{ dob_str }}">
+          <a href="#" data-fname="{{ client.first_name }}" data-mname="{{ client.middle_name or '' }}" data-lname="{{ client.last_name or '' }}" data-dob="{{ dob_str }}">
             <span class="client-name">{{ client.full_name }}</span>
             <span class="client-dob">{{ dob_display }}</span>
           </a>
@@ -228,7 +226,7 @@ block content %}
     margin-bottom: 1.5rem;
   }
   .form-bar input {
-    /* MODIFIED: Increased base size to prevent early wrapping */
+    /* MODIFIED: Increased base size to prevent early wrapping on PC */
     flex: 1 1 180px; 
     min-width: 180px; 
   }
@@ -283,38 +281,29 @@ block content %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("clientModal");
-    const openBtn = document.getElementById("loadClientBtn");
-    // FIX: Re-query for close button inside the modal
+    // FIX: Query for elements INSIDE the modal
     const closeBtn = modal.querySelector(".modal-close-button");
     const searchInput = modal.querySelector("#clientSearchInput");
     const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
+    
+    const openBtn = document.getElementById("loadClientBtn");
     const clearBtn = document.getElementById("clearFormBtn");
 
     if (openBtn) { openBtn.onclick = () => { modal.style.display = "block"; }; }
     if (closeBtn) { closeBtn.onclick = () => { modal.style.display = "none"; }; }
     window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
 
+    // FIX: Query for items INSIDE the modal
     modal.querySelectorAll(".client-item a").forEach((item) => {
       item.addEventListener("click", function (event) {
         event.preventDefault();
         document.getElementById("first_name").value = this.dataset.fname;
         document.getElementById("middle_name").value = this.dataset.mname;
         document.getElementById("last_name").value = this.dataset.lname;
-        // MODIFIED: This now gets the YYYY-MM-DD string from the client list
-        // and sets it into the DD-MM-YYYY input field.
-        // We must reformat it.
-        const dob_yyyy_mm_dd = this.dataset.dob;
-        if (dob_yyyy_mm_dd) {
-            const parts = dob_yyyy_mm_dd.split('-');
-            if (parts.length === 3) {
-                const dob_dd_mm_yyyy = `${parts[2]}-${parts[1]}-${parts[0]}`;
-                document.getElementById("dob").value = dob_dd_mm_yyyy;
-            } else {
-                 document.getElementById("dob").value = dob_yyyy_mm_dd; // fallback
-            }
-        } else {
-            document.getElementById("dob").value = '';
-        }
+        
+        // FIX: No reformatting needed. data-dob is YYYY-MM-DD,
+        // which is the exact format input[type=date] requires.
+        document.getElementById("dob").value = this.dataset.dob;
         
         modal.style.display = "none";
         document.querySelector(".form-bar").submit();
