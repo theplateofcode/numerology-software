@@ -24,49 +24,50 @@ def require_login():
 
 
 
+# numerology_app/routes/numerology.py
+
+
 @numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
 def numerology_home():
     if request.method == "POST":
         first_name = request.form.get("first_name", "").strip()
         middle_name = request.form.get("middle_name", "").strip()
         last_name = request.form.get("last_name", "").strip()
-        
-        # Get the date as typed by the user (e.g., "15 04 1979")
         dob_from_form = request.form.get("dob", "").strip()
         
-        # --- START OF NEW, ROBUST DATE FIX ---
         try:
-            # This handles "15 04 1979", "15-04-1979", "15/04/1979", "15.04.1979"
-            # It splits by one or more spaces, slashes, dots, or hyphens
-            parts = re.split(r'[ /.-]+', dob_from_form)
+            # --- START OF NEW, MORE ROBUST FIX ---
+            
+            # 1. Replace all common separators with a single hyphen
+            temp_dob = dob_from_form.replace(" ", "-").replace("/", "-").replace(".", "-").replace("+", "-")
+            
+            # 2. Condense multiple hyphens (e.g., "15--04") into one
+            temp_dob = re.sub(r'-+', '-', temp_dob) 
+            
+            # 3. Now split by the single hyphen
+            parts = temp_dob.split('-')
+            # --- END OF NEW FIX ---
             
             if len(parts) == 3:
-                # Check if the format is DD MM YYYY
-                if len(parts[2]) == 4:
-                    day, month, year = parts[0], parts[1], parts[2]
-                # Check if the format is YYYY-MM-DD (from "Load Client")
-                elif len(parts[0]) == 4:
-                    year, month, day = parts[0], parts[1], parts[2]
-                else:
-                    raise ValueError("Ambiguous date format")
+                day, month, year = parts[0], parts[1], parts[2]
+                
+                # Sanity check for year length
+                if len(year) != 4:
+                    raise ValueError("Year must be 4 digits")
                     
                 # Re-assemble in the correct YYYY-MM-DD format
-                dob_for_backend = f"{year.zfill(4)}-{month.zfill(2)}-{day.zfill(2)}"
+                dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
             else:
-                # If it's not 3 parts, it's invalid
                 raise ValueError("Invalid date format")
-        except Exception:
-            # If any error occurs, flash a message and stop
+        except Exception as e:
+            # This error will now only trigger if the format is truly wrong
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
             return redirect(url_for("numerology.numerology_home"))
         
-        # Use the *new* backend-safe variable for ALL operations
         dob = dob_for_backend 
-        # --- END OF DATE FIX ---
 
         full_name = " ".join([p for p in [first_name, middle_name, last_name] if p])
 
-        # All these functions will now correctly receive "YYYY-MM-DD"
         results = {
             "life_path": numerology.life_path(dob),
             "expression": numerology.expression_number(full_name, numerology.PYTHAGOREAN_MAPPING),
@@ -82,14 +83,13 @@ def numerology_home():
         results["missing_repeat"] = {"repeating": repeat_dict, "missing": missing_list}
 
         if first_name and dob:
-            # Save the YYYY-MM-DD version to the DB
             existing = Client.query.filter_by(first_name=first_name, dob=dob).first()
             if not existing:
                 new_client = Client(
                     first_name=first_name,
                     middle_name=middle_name,
                     last_name=last_name,
-                    dob=dob # Save the YYYY-MM-DD version
+                    dob=dob 
                 )
                 db.session.add(new_client)
                 db.session.commit()
@@ -98,7 +98,7 @@ def numerology_home():
             "first_name": first_name,
             "middle_name": middle_name,
             "last_name": last_name,
-            "dob": dob_from_form, # Save the original "DD MM YYYY" for the input field
+            "dob": dob_from_form, # Save the original "DD MM YYYY"
         }
         session["numerology_results"] = results
 
@@ -107,9 +107,9 @@ def numerology_home():
     # GET request logic
     results = session.get("numerology_results", {}) or {}
     clients = Client.query.order_by(Client.created_at.desc()).all()
-    return render_template("numerology/home.html", results=results, clients=clients).. (rest of your file) ...
-# ... (rest of your file) ...... (rest of your routes) ...
+    return render_template("numerology/home.html", results=results, clients=clients)
 
+# ... (rest of your .py file) ...
 @numerology_bp.route("/clear", methods=["GET"])
 def clear_session():
     """
