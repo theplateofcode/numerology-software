@@ -7,7 +7,7 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 # We will store the password in a file for persistence.
 PASSWORD_FILE = "password.txt"
 DEFAULT_PASSWORD = "password123" # The initial password
-USERNAME = "admin"
+USERNAME = "nehasnirav"
 
 def get_password():
     """Reads the password from the file, or creates the file with the default."""
