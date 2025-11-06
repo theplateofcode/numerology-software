@@ -22,9 +22,9 @@ block content %}
     />
     
     <input
-      id="dob" name="dob" type="text" placeholder="YYYY-MM-DD"
-      pattern="\d{4}-\d{2}-\d{2}" 
-      title="Please enter the date in YYYY-MM-DD format"
+      id="dob" name="dob" type="text" placeholder="DD MM YYYY"
+      pattern="\d{2} \d{2} \d{4}" 
+      title="Please enter the date in DD MM YYYY format"
       value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
     />
     
@@ -284,9 +284,9 @@ block content %}
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("clientModal");
     const openBtn = document.getElementById("loadClientBtn");
-    // FIX: Query for elements INSIDE the modal
     const closeBtn = modal.querySelector(".modal-close-button");
     const searchInput = modal.querySelector("#clientSearchInput");
+    const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
     
     const clearBtn = document.getElementById("clearFormBtn");
 
@@ -294,7 +294,6 @@ block content %}
     if (closeBtn) { closeBtn.onclick = () => { modal.style.display = "none"; }; }
     window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
 
-    // FIX: Query for items INSIDE the modal
     modal.querySelectorAll(".client-item a").forEach((item) => {
       item.addEventListener("click", function (event) {
         event.preventDefault();
@@ -302,9 +301,20 @@ block content %}
         document.getElementById("middle_name").value = this.dataset.mname;
         document.getElementById("last_name").value = this.dataset.lname;
         
-        // FIX: No reformatting needed. data-dob is YYYY-MM-DD,
-        // which is the exact format input[type="text"] (with the pattern) needs.
-        document.getElementById("dob").value = this.dataset.dob;
+        // MODIFIED: Reformat YYYY-MM-DD from data to DD MM YYYY for the input
+        const dob_yyyy_mm_dd = this.dataset.dob;
+        if (dob_yyyy_mm_dd) {
+            const parts = dob_yyyy_mm_dd.split('-'); // ["YYYY", "MM", "DD"]
+            if (parts.length === 3) {
+                // Reorder to DD MM YYYY
+                const dob_dd_mm_yyyy = `${parts[2]} ${parts[1]} ${parts[0]}`;
+                document.getElementById("dob").value = dob_dd_mm_yyyy;
+            } else {
+                 document.getElementById("dob").value = dob_yyyy_mm_dd; // Fallback
+            }
+        } else {
+            document.getElementById("dob").value = '';
+        }
         
         modal.style.display = "none";
         document.querySelector(".form-bar").submit();
@@ -312,8 +322,6 @@ block content %}
     });
 
     if (searchInput) {
-      // FIX: Check if clientItems were found before adding listener
-      const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
       searchInput.addEventListener("keyup", function () {
         const filter = searchInput.value.toLowerCase();
         clientItems.forEach((item) => {
