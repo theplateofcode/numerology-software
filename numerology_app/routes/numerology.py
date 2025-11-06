@@ -51,16 +51,14 @@ def numerology_home():
         try:
             # --- THIS IS THE FIX ---
             # Added a '+' after the brackets to split by ONE OR MORE delimiters.
-            # This now handles "15 04 1979" and "15  04  1979" correctly.
             parts = re.split(r'[ /.-+]+', dob_from_form) 
             # --- END OF FIX ---
             
             if len(parts) == 3:
                 day, month, year = parts[0], parts[1], parts[2]
                 # Re-assemble in the correct YYYY-MM-DD format
-                dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                dob_for_backend = f"{year.zfill(4)}-{month.zfill(2)}-{day.zfill(2)}"
             else:
-                # If it's not 3 parts, it's an invalid format
                 raise ValueError("Invalid date format")
         except Exception:
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
@@ -110,7 +108,6 @@ def numerology_home():
     results = session.get("numerology_results", {}) or {}
     clients = Client.query.order_by(Client.created_at.desc()).all()
     return render_template("numerology/home.html", results=results, clients=clients)
-
 # ... (rest of your file) ...... (rest of your routes) ...
 
 @numerology_bp.route("/clear", methods=["GET"])
