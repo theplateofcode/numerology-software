@@ -66,7 +66,7 @@ def numerology_home():
             return redirect(url_for("numerology.numerology_home"))
         
         # 3. Use the *new* backend-safe variable for ALL operations
-        dob = dob_for_backend 
+        dob = dob_for_backend[1:-1] 
         # --- END OF DATE FIX ---
 
         full_name = " ".join([p for p in [first_name, middle_name, last_name] if p])
