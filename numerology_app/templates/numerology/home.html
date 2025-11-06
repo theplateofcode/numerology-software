@@ -22,9 +22,9 @@ block content %}
     />
     
     <input
-      id="dob" name="dob" type="text" placeholder="YYYY-MM-DD"
-      pattern="\d{4}-\d{2}-\d{2}" 
-      title="Please enter the date in YYYY-MM-DD format"
+      id="dob" name="dob" type="text" placeholder="DD-MM-YYYY"
+      pattern="\d{2}-\d{2}-\d{4}" 
+      title="Please enter the date in DD-MM-YYYY format"
       value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
     />
     
@@ -177,7 +177,34 @@ block content %}
 </main>
 
 <div id="clientModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close-button">&times;</span>
+    <h3>Load a Client</h3>
+    <input type="text" id="clientSearchInput" placeholder="Search for clients..."/>
+    <div class="client-list-header">
+      <span>Name</span>
+      <span>Date of Birth</span>
+    </div>
+    <div class="modal-client-list">
+      {% if clients %}
+      <ul>
+        {% for client in clients %}
+        <li class="client-item">
+          {% set dob_str = client.dob if client.dob is string else client.dob.strftime('%Y-%m-%d') %}
+          {% set dob_display = client.dob if client.dob is string else client.dob.strftime('%d-%b-%Y') %}
+          <a href="#" data-fname="{{ client.first_name }}" data-mname="{{ client.middle_name }}" data-lname="{{ client.last_name }}" data-dob="{{ dob_str }}">
+            <span class="client-name">{{ client.full_name }}</span>
+            <span class="client-dob">{{ dob_display }}</span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No clients have been saved yet.</p>
+      {% endif %}
+    </div>
   </div>
+</div>
 
 <style>
   /* Header Styles */
@@ -189,30 +216,32 @@ block content %}
   /* Button Styles */
   .compact-button.secondary-style { background-color: var(--color-accent-light); color: var(--color-text); }
   .compact-button.secondary-style:hover { background-color: var(--color-hover); color: white; }
-  .form-bar > * { vertical-align: middle; }
   .icon-button { padding: 0.45rem 0.6rem; line-height: 0; }
   .icon-button svg { vertical-align: middle; }
 
-  /* --- FIX 2: Responsive Form Bar --- */
+  /* --- RESPONSIVE FORM BAR --- */
   .form-bar {
     display: flex;
-    gap: 0.5rem;
+    flex-wrap: wrap; /* Allows items to wrap */
+    gap: 0.75rem; /* Space between all items */
     align-items: center;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap; /* Allows items to wrap to the next line */
   }
   .form-bar input {
-    flex: 1 1 120px; /* Allow inputs to grow and shrink, with a base size */
-    min-width: 120px; /* Don't shrink smaller than this */
+    /* MODIFIED: Increased base size to prevent early wrapping */
+    flex: 1 1 180px; 
+    min-width: 180px; 
   }
   .form-bar button, 
   .form-bar .compact-button {
-    flex-shrink: 0; /* Prevent buttons from shrinking */
+    flex-shrink: 0; 
+    height: 38px; 
+    box-sizing: border-box;
   }
-  /* --- End Fix 2 --- */
+  /* --- End Responsive Form Bar --- */
 
 
-  /* Three-Column Dashboard Layout (Unchanged) */
+  /* Three-Column Dashboard Layout */
   .dashboard-grid { display: grid; grid-template-columns: 2.5fr 1.2fr 1.3fr; gap: 1.5rem; align-items: start; }
   @media (max-width: 1200px) { .dashboard-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
@@ -224,7 +253,7 @@ block content %}
   .primary-table td:first-child { font-weight: 500; text-align: left; }
   .primary-table td:nth-child(2) { font-weight: 600; color: var(--color-accent); }
 
-  /* Modal Styles (Unchanged) */
+  /* Modal Styles */
   .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.6); }
   .modal-content { background-color: #fefefe; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 25px 30px; border: 1px solid #ddd; width: 90%; max-width: 550px; max-height: 80vh; border-radius: var(--radius); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); display: flex; flex-direction: column; }
   .modal-close-button { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
@@ -255,22 +284,38 @@ block content %}
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("clientModal");
     const openBtn = document.getElementById("loadClientBtn");
-    const closeBtn = document.querySelector(".modal-close-button");
-    const searchInput = document.getElementById("clientSearchInput");
-    const clientItems = document.querySelectorAll(".modal-client-list .client-item");
-    const clearBtn = document.getElementById("clearFormBtn"); // Get the Clear button
+    // FIX: Re-query for close button inside the modal
+    const closeBtn = modal.querySelector(".modal-close-button");
+    const searchInput = modal.querySelector("#clientSearchInput");
+    const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
+    const clearBtn = document.getElementById("clearFormBtn");
 
     if (openBtn) { openBtn.onclick = () => { modal.style.display = "block"; }; }
     if (closeBtn) { closeBtn.onclick = () => { modal.style.display = "none"; }; }
     window.onclick = (event) => { if (event.target == modal) { modal.style.display = "none"; } };
 
-    document.querySelectorAll(".client-item a").forEach((item) => {
+    modal.querySelectorAll(".client-item a").forEach((item) => {
       item.addEventListener("click", function (event) {
         event.preventDefault();
         document.getElementById("first_name").value = this.dataset.fname;
         document.getElementById("middle_name").value = this.dataset.mname;
         document.getElementById("last_name").value = this.dataset.lname;
-        document.getElementById("dob").value = this.dataset.dob;
+        // MODIFIED: This now gets the YYYY-MM-DD string from the client list
+        // and sets it into the DD-MM-YYYY input field.
+        // We must reformat it.
+        const dob_yyyy_mm_dd = this.dataset.dob;
+        if (dob_yyyy_mm_dd) {
+            const parts = dob_yyyy_mm_dd.split('-');
+            if (parts.length === 3) {
+                const dob_dd_mm_yyyy = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                document.getElementById("dob").value = dob_dd_mm_yyyy;
+            } else {
+                 document.getElementById("dob").value = dob_yyyy_mm_dd; // fallback
+            }
+        } else {
+            document.getElementById("dob").value = '';
+        }
+        
         modal.style.display = "none";
         document.querySelector(".form-bar").submit();
       });
@@ -286,16 +331,13 @@ block content %}
       });
     }
 
-    // Clear Button Logic
     if (clearBtn) {
         clearBtn.addEventListener("click", function(event) {
             event.preventDefault(); 
-            // This is the correct way to clear the form and results
             window.location.href = "{{ url_for('numerology.clear_session') }}";
         });
     }
 
-    // PDF Report Button Logic
     const pdfBtn = document.getElementById("generatePdfBtn");
     if (pdfBtn) {
       pdfBtn.addEventListener("click", function (event) { 
