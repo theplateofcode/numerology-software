@@ -49,18 +49,31 @@ def numerology_home():
         dob_from_form = request.form.get("dob", "").strip()
         
         try:
-            # --- THIS IS THE FIX ---
-            # Added a '+' after the brackets to split by ONE OR MORE delimiters.
-            parts = re.split(r'[ /.-+]+', dob_from_form) 
-            # --- END OF FIX ---
+            # --- START OF NEW, MORE ROBUST FIX ---
+            
+            # 1. Replace all common separators with a single hyphen
+            temp_dob = dob_from_form.replace(" ", "-").replace("/", "-").replace(".", "-").replace("+", "-")
+            
+            # 2. Condense multiple hyphens (e.g., "15--04") into one
+            temp_dob = re.sub(r'-+', '-', temp_dob) 
+            
+            # 3. Now split by the single hyphen
+            parts = temp_dob.split('-')
+            # --- END OF NEW FIX ---
             
             if len(parts) == 3:
                 day, month, year = parts[0], parts[1], parts[2]
+                
+                # Sanity check for year length
+                if len(year) != 4:
+                    raise ValueError("Year must be 4 digits")
+                    
                 # Re-assemble in the correct YYYY-MM-DD format
-                dob_for_backend = f"{year.zfill(4)}-{month.zfill(2)}-{day.zfill(2)}"
+                dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
             else:
                 raise ValueError("Invalid date format")
-        except Exception:
+        except Exception as e:
+            # This error will now only trigger if the format is truly wrong
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
             return redirect(url_for("numerology.numerology_home"))
         
@@ -108,6 +121,8 @@ def numerology_home():
     results = session.get("numerology_results", {}) or {}
     clients = Client.query.order_by(Client.created_at.desc()).all()
     return render_template("numerology/home.html", results=results, clients=clients)
+
+# ... (rest of your file) ...
 # ... (rest of your file) ...... (rest of your routes) ...
 
 @numerology_bp.route("/clear", methods=["GET"])
