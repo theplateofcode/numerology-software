@@ -22,7 +22,9 @@ block content %}
     />
     
     <input
-      id="dob" name="dob" type="date"
+      id="dob" name="dob" type="text" placeholder="YYYY-MM-DD"
+      pattern="\d{4}-\d{2}-\d{2}" 
+      title="Please enter the date in YYYY-MM-DD format"
       value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
     />
     
@@ -281,12 +283,11 @@ block content %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const modal = document.getElementById("clientModal");
+    const openBtn = document.getElementById("loadClientBtn");
     // FIX: Query for elements INSIDE the modal
     const closeBtn = modal.querySelector(".modal-close-button");
     const searchInput = modal.querySelector("#clientSearchInput");
-    const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
     
-    const openBtn = document.getElementById("loadClientBtn");
     const clearBtn = document.getElementById("clearFormBtn");
 
     if (openBtn) { openBtn.onclick = () => { modal.style.display = "block"; }; }
@@ -302,7 +303,7 @@ block content %}
         document.getElementById("last_name").value = this.dataset.lname;
         
         // FIX: No reformatting needed. data-dob is YYYY-MM-DD,
-        // which is the exact format input[type=date] requires.
+        // which is the exact format input[type="text"] (with the pattern) needs.
         document.getElementById("dob").value = this.dataset.dob;
         
         modal.style.display = "none";
@@ -311,6 +312,8 @@ block content %}
     });
 
     if (searchInput) {
+      // FIX: Check if clientItems were found before adding listener
+      const clientItems = modal.querySelectorAll(".modal-client-list .client-item");
       searchInput.addEventListener("keyup", function () {
         const filter = searchInput.value.toLowerCase();
         clientItems.forEach((item) => {
