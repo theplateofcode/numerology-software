@@ -23,21 +23,6 @@ def require_login():
         return redirect(url_for("auth.login"))
 
 
-# numerology_app/routes/numerology.py
-
-# --- ADD THIS IMPORT AT THE TOP ---
-import re
-from flask import Blueprint, render_template, request, session, redirect, url_for, Response, current_app, flash
-# ... (your other imports)
-from numerology_app.utils import numerology
-from numerology_app import db
-from numerology_app.models import (
-    LifePath, LifeExpression, SoulUrge, BirthdayDetails, AlphabetDetails,
-    RepeatingNumber, MissingNumber, KarmicLineMeaning, Client,
-)
-from datetime import datetime
-
-numerology_bp = Blueprint("numerology", __name__, url_prefix="/numerology")
 
 @numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
 def numerology_home():
