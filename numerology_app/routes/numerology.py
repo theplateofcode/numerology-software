@@ -24,8 +24,16 @@ def require_login():
 
 
 
+# numerology_app/routes/numerology.py
 
-@numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
+# --- Make sure you have these imports at the top ---
+from flask import (
+    Blueprint, render_template, request, session, 
+    redirect, url_for, Response, current_app, flash
+)
+# ---------------------------------------------------
+
+
 def numerology_home():
     if request.method == "POST":
         first_name = request.form.get("first_name", "").strip()
@@ -35,25 +43,36 @@ def numerology_home():
         dob_from_form = request.form.get("dob", "").strip()
         
         try:
-            # --- THIS IS THE FIX ---
-            # Added a '+' after the brackets to split by ONE OR MORE delimiters.
-            # This now correctly handles "15 04 1979" and "15+04+1979"
-            parts = re.split(r'[ /.-+]+', dob_from_form) 
-            # --- END OF FIX ---
+            # --- START OF NEW, SIMPLER FIX ---
+            
+            # This handles "15 04 1979" (with spaces)
+            # It also handles "1979-04-15" (from Load Client)
+            
+            # First, replace any other separators just in case
+            temp_dob = dob_from_form.replace("/", " ").replace(".", " ").replace("-", " ")
+            # Condense multiple spaces into one
+            temp_dob = re.sub(r'\s+', ' ', temp_dob) 
+            
+            parts = temp_dob.split(' ') # Split by single space
+            
+            # --- END OF NEW FIX ---
             
             if len(parts) == 3:
                 day, month, year = parts[0], parts[1], parts[2]
                 
-                # Sanity check for year length
-                if len(year) != 4:
-                    raise ValueError("Year must be 4 digits")
+                # Check if format is DD MM YYYY
+                if len(year) == 4:
+                    dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                # Check if format is YYYY MM DD
+                elif len(day) == 4:
+                    year, month, day = parts[0], parts[1], parts[2]
+                    dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                else:
+                    raise ValueError("Ambiguous date format")
                     
-                # Re-assemble in the correct YYYY-MM-DD format
-                dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
             else:
                 raise ValueError("Invalid date format")
         except Exception as e:
-            # This error will now only trigger if the format is truly wrong
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
             return redirect(url_for("numerology.numerology_home"))
         
@@ -101,6 +120,10 @@ def numerology_home():
     results = session.get("numerology_results", {}) or {}
     clients = Client.query.order_by(Client.created_at.desc()).all()
     return render_template("numerology/home.html", results=results, clients=clients)
+
+# ... (rest of your .py file) ...
+
+
 
 # ... (rest of your file) ...
 @numerology_bp.route("/clear", methods=["GET"])
