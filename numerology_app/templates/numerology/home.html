@@ -23,7 +23,6 @@ block content %}
     
     <input
       id="dob" name="dob" type="text" placeholder="DD MM YYYY"
-      pattern="\d{2} \d{2} \d{4}" 
       title="Please enter the date in DD MM YYYY format"
       value="{{ session['numerology_input']['dob'] if session.get('numerology_input') else '' }}" required
     />
@@ -306,7 +305,7 @@ block content %}
         if (dob_yyyy_mm_dd) {
             const parts = dob_yyyy_mm_dd.split('-'); // ["YYYY", "MM", "DD"]
             if (parts.length === 3) {
-                // Reorder to DD MM YYYY
+                // Reorder to DD MM YYYY with spaces
                 const dob_dd_mm_yyyy = `${parts[2]} ${parts[1]} ${parts[0]}`;
                 document.getElementById("dob").value = dob_dd_mm_yyyy;
             } else {
