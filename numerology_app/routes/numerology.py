@@ -12,6 +12,7 @@ from numerology_app.models import (
     LuckyDayMeaning, LuckyYearMonthMeaning
 )
 from datetime import datetime
+import re
 
 numerology_bp = Blueprint("numerology", __name__, url_prefix="/numerology")
 
