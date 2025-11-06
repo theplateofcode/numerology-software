@@ -24,15 +24,6 @@ def require_login():
 
 
 
-# numerology_app/routes/numerology.py
-
-# --- Make sure you have these imports at the top ---
-from flask import (
-    Blueprint, render_template, request, session, 
-    redirect, url_for, Response, current_app, flash
-)
-# ---------------------------------------------------
-
 @numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
 def numerology_home():
     if request.method == "POST":
@@ -40,77 +31,65 @@ def numerology_home():
         middle_name = request.form.get("middle_name", "").strip()
         last_name = request.form.get("last_name", "").strip()
         
+        # Get the date as typed by the user (e.g., "15 04 1979")
         dob_from_form = request.form.get("dob", "").strip()
         
+        # --- START OF NEW, ROBUST DATE FIX ---
         try:
-            # --- START OF NEW, ROBUST DATE FIX ---
-            
-            # 1. Replace all possible separators (/, ., -, +) with a single space
-            temp_dob = re.sub(r'[ /.-]+', ' ', dob_from_form)
-            
-            # 2. Now split by the single space
-            parts = temp_dob.split(' ')
-            
-            # --- END OF NEW FIX ---
+            # This handles "15 04 1979", "15-04-1979", "15/04/1979", "15.04.1979"
+            # It splits by one or more spaces, slashes, dots, or hyphens
+            parts = re.split(r'[ /.-]+', dob_from_form)
             
             if len(parts) == 3:
-                part1, part2, part3 = parts[0], parts[1], parts[2]
-                
-                # Check if format is DD MM YYYY
-                if len(part3) == 4:
-                    day, month, year = part1, part2, part3
-                # Check if format is YYYY MM DD (e.g., from Load Client)
-                elif len(part1) == 4:
-                    year, month, day = part1, part2, part3
+                # Check if the format is DD MM YYYY
+                if len(parts[2]) == 4:
+                    day, month, year = parts[0], parts[1], parts[2]
+                # Check if the format is YYYY-MM-DD (from "Load Client")
+                elif len(parts[0]) == 4:
+                    year, month, day = parts[0], parts[1], parts[2]
                 else:
                     raise ValueError("Ambiguous date format")
                     
                 # Re-assemble in the correct YYYY-MM-DD format
                 dob_for_backend = f"{year.zfill(4)}-{month.zfill(2)}-{day.zfill(2)}"
             else:
+                # If it's not 3 parts, it's invalid
                 raise ValueError("Invalid date format")
-        except Exception as e:
-            # This error will now only trigger if the format is truly wrong
+        except Exception:
+            # If any error occurs, flash a message and stop
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
             return redirect(url_for("numerology.numerology_home"))
         
+        # Use the *new* backend-safe variable for ALL operations
         dob = dob_for_backend 
+        # --- END OF DATE FIX ---
 
         full_name = " ".join([p for p in [first_name, middle_name, last_name] if p])
 
-        # --- FIX: Move calculations into their own try...except block ---
-        # This prevents a calculation error from being misreported as a date error
-        try:
-            results = {
-                "life_path": numerology.life_path(dob),
-                "expression": numerology.expression_number(full_name, numerology.PYTHAGOREAN_MAPPING),
-                "soul_urge": numerology.soul_urge(full_name),
-                "birthday": numerology.birthday_number(dob),
-                "alphabet": full_name[0].upper() if full_name else "—",
-                "karmic_chart": numerology.karmic_chart_and_lines(dob),
-                "future_prediction": numerology.future_predictions(dob),
-            }
+        # All these functions will now correctly receive "YYYY-MM-DD"
+        results = {
+            "life_path": numerology.life_path(dob),
+            "expression": numerology.expression_number(full_name, numerology.PYTHAGOREAN_MAPPING),
+            "soul_urge": numerology.soul_urge(full_name),
+            "birthday": numerology.birthday_number(dob),
+            "alphabet": full_name[0].upper() if full_name else "—",
+            "karmic_chart": numerology.karmic_chart_and_lines(dob),
+            "future_prediction": numerology.future_predictions(dob),
+        }
 
-            repeat_dict = numerology.repeating_numbers(dob)
-            missing_list = numerology.missing_numbers(dob)
-            results["missing_repeat"] = {"repeating": repeat_dict, "missing": missing_list}
-        
-        except Exception as e:
-            # This is a REAL calculation error
-            current_app.logger.error(f"Numerology calculation failed for DOB {dob}: {e}")
-            flash(f"Calculation error. Please check the input values. Error: {e}", "error")
-            return redirect(url_for("numerology.numerology_home"))
-        # --- END OF FIX ---
-
+        repeat_dict = numerology.repeating_numbers(dob)
+        missing_list = numerology.missing_numbers(dob)
+        results["missing_repeat"] = {"repeating": repeat_dict, "missing": missing_list}
 
         if first_name and dob:
+            # Save the YYYY-MM-DD version to the DB
             existing = Client.query.filter_by(first_name=first_name, dob=dob).first()
             if not existing:
                 new_client = Client(
                     first_name=first_name,
                     middle_name=middle_name,
                     last_name=last_name,
-                    dob=dob 
+                    dob=dob # Save the YYYY-MM-DD version
                 )
                 db.session.add(new_client)
                 db.session.commit()
@@ -119,7 +98,7 @@ def numerology_home():
             "first_name": first_name,
             "middle_name": middle_name,
             "last_name": last_name,
-            "dob": dob_from_form, # Save the original "DD MM YYYY"
+            "dob": dob_from_form, # Save the original "DD MM YYYY" for the input field
         }
         session["numerology_results"] = results
 
@@ -128,12 +107,9 @@ def numerology_home():
     # GET request logic
     results = session.get("numerology_results", {}) or {}
     clients = Client.query.order_by(Client.created_at.desc()).all()
-    return render_template("numerology/home.html", results=results, clients=clients)
+    return render_template("numerology/home.html", results=results, clients=clients).. (rest of your file) ...
+# ... (rest of your file) ...... (rest of your routes) ...
 
-# ... (rest of your .py file) ...
-
-
-# ... (rest of your file) ...
 @numerology_bp.route("/clear", methods=["GET"])
 def clear_session():
     """
