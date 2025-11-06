@@ -33,7 +33,7 @@ from flask import (
 )
 # ---------------------------------------------------
 
-
+@numerology_bp.route("/", methods=["GET", "POST"], endpoint="numerology_home")
 def numerology_home():
     if request.method == "POST":
         first_name = request.form.get("first_name", "").strip()
@@ -43,36 +43,34 @@ def numerology_home():
         dob_from_form = request.form.get("dob", "").strip()
         
         try:
-            # --- START OF NEW, SIMPLER FIX ---
+            # --- START OF NEW, ROBUST DATE FIX ---
             
-            # This handles "15 04 1979" (with spaces)
-            # It also handles "1979-04-15" (from Load Client)
+            # 1. Replace all possible separators (/, ., -, +) with a single space
+            temp_dob = re.sub(r'[ /.-]+', ' ', dob_from_form)
             
-            # First, replace any other separators just in case
-            temp_dob = dob_from_form.replace("/", " ").replace(".", " ").replace("-", " ")
-            # Condense multiple spaces into one
-            temp_dob = re.sub(r'\s+', ' ', temp_dob) 
-            
-            parts = temp_dob.split(' ') # Split by single space
+            # 2. Now split by the single space
+            parts = temp_dob.split(' ')
             
             # --- END OF NEW FIX ---
             
             if len(parts) == 3:
-                day, month, year = parts[0], parts[1], parts[2]
+                part1, part2, part3 = parts[0], parts[1], parts[2]
                 
                 # Check if format is DD MM YYYY
-                if len(year) == 4:
-                    dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
-                # Check if format is YYYY MM DD
-                elif len(day) == 4:
-                    year, month, day = parts[0], parts[1], parts[2]
-                    dob_for_backend = f"{year}-{month.zfill(2)}-{day.zfill(2)}"
+                if len(part3) == 4:
+                    day, month, year = part1, part2, part3
+                # Check if format is YYYY MM DD (e.g., from Load Client)
+                elif len(part1) == 4:
+                    year, month, day = part1, part2, part3
                 else:
                     raise ValueError("Ambiguous date format")
                     
+                # Re-assemble in the correct YYYY-MM-DD format
+                dob_for_backend = f"{year.zfill(4)}-{month.zfill(2)}-{day.zfill(2)}"
             else:
                 raise ValueError("Invalid date format")
         except Exception as e:
+            # This error will now only trigger if the format is truly wrong
             flash(f"Invalid date format: '{dob_from_form}'. Please use DD MM YYYY.", "error")
             return redirect(url_for("numerology.numerology_home"))
         
@@ -80,19 +78,30 @@ def numerology_home():
 
         full_name = " ".join([p for p in [first_name, middle_name, last_name] if p])
 
-        results = {
-            "life_path": numerology.life_path(dob),
-            "expression": numerology.expression_number(full_name, numerology.PYTHAGOREAN_MAPPING),
-            "soul_urge": numerology.soul_urge(full_name),
-            "birthday": numerology.birthday_number(dob),
-            "alphabet": full_name[0].upper() if full_name else "—",
-            "karmic_chart": numerology.karmic_chart_and_lines(dob),
-            "future_prediction": numerology.future_predictions(dob),
-        }
+        # --- FIX: Move calculations into their own try...except block ---
+        # This prevents a calculation error from being misreported as a date error
+        try:
+            results = {
+                "life_path": numerology.life_path(dob),
+                "expression": numerology.expression_number(full_name, numerology.PYTHAGOREAN_MAPPING),
+                "soul_urge": numerology.soul_urge(full_name),
+                "birthday": numerology.birthday_number(dob),
+                "alphabet": full_name[0].upper() if full_name else "—",
+                "karmic_chart": numerology.karmic_chart_and_lines(dob),
+                "future_prediction": numerology.future_predictions(dob),
+            }
 
-        repeat_dict = numerology.repeating_numbers(dob)
-        missing_list = numerology.missing_numbers(dob)
-        results["missing_repeat"] = {"repeating": repeat_dict, "missing": missing_list}
+            repeat_dict = numerology.repeating_numbers(dob)
+            missing_list = numerology.missing_numbers(dob)
+            results["missing_repeat"] = {"repeating": repeat_dict, "missing": missing_list}
+        
+        except Exception as e:
+            # This is a REAL calculation error
+            current_app.logger.error(f"Numerology calculation failed for DOB {dob}: {e}")
+            flash(f"Calculation error. Please check the input values. Error: {e}", "error")
+            return redirect(url_for("numerology.numerology_home"))
+        # --- END OF FIX ---
+
 
         if first_name and dob:
             existing = Client.query.filter_by(first_name=first_name, dob=dob).first()
@@ -122,7 +131,6 @@ def numerology_home():
     return render_template("numerology/home.html", results=results, clients=clients)
 
 # ... (rest of your .py file) ...
-
 
 
 # ... (rest of your file) ...
